@@ -19,6 +19,7 @@ export function SelectField({
   placeholder = "Select an option",
   id,
   className,
+  value,
   ...props
 }: SelectFieldProps) {
   const generatedId = React.useId();
@@ -43,7 +44,10 @@ export function SelectField({
         <select
           id={fieldId}
           aria-invalid={!!error}
-          defaultValue=""
+          // Controlled when a `value` is supplied; otherwise fall back to the
+          // empty placeholder via defaultValue (avoids mixing both props).
+          value={value}
+          defaultValue={value === undefined ? "" : undefined}
           className={cn(
             "h-12 w-full appearance-none bg-transparent px-4 pr-10 text-[15px] text-[#111111] outline-none",
             "[&:invalid]:text-[#9CA3AF]",

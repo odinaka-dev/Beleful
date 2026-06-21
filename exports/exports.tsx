@@ -21,3 +21,8 @@ export { default as VendorStorePage } from "@/screens/student/vendor-store";
 export { default as CartPage } from "@/screens/student/cart";
 export { default as CheckoutPage } from "@/screens/student/checkout";
 export { default as OrderTrackingPage } from "@/screens/student/order-tracking";
+
+// agent dashboard imports goes here
+export { default as AgentDashboard } from "@/screens/agent/dashboard";
+export { default as AgentEarnings } from "@/screens/agent/earnings";
+export { default as AgentProfile } from "@/screens/agent/profile";
