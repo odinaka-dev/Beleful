@@ -23,6 +23,13 @@ export function StudentTopNav() {
   const pathname = usePathname() ?? "";
   const router = useRouter();
   const [campus, setCampus] = React.useState(CAMPUSES[0]);
+  const [search, setSearch] = React.useState("");
+
+  function submitSearch() {
+    const params = new URLSearchParams();
+    if (search) params.set("q", search);
+    router.push(`/user-dashboard/explore?${params.toString()}`);
+  }
 
   const isDashboard = pathname === "/user-dashboard";
 
@@ -76,6 +83,9 @@ export function StudentTopNav() {
           <SearchNormal1 size={18} color="#666666" />
           <input
             type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && submitSearch()}
             placeholder="Search food, vendors..."
             className="h-11 w-full min-w-0 bg-transparent text-sm text-[#111111] outline-none placeholder:text-[#9CA3AF]"
           />

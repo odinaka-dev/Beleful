@@ -1,24 +1,18 @@
-// Mock domain data for the student food-ordering experience.
-// Swap for Supabase queries when the API layer lands.
+// Shared types + presentational helpers for the student food-ordering experience.
+// Data itself comes from Supabase — see each screen's data-fetching effect.
 
 export interface Category {
   id: string;
   name: string;
-  emoji: string;
-  /** Tailwind-friendly hex used for the soft tinted card background. */
-  color: string;
+  image: string | null;
 }
 
 export interface Vendor {
   id: string;
   name: string;
-  /** Emoji used by the gradient image placeholder. */
-  emoji: string;
-  /** Two hex stops for the placeholder gradient. */
-  gradient: [string, string];
+  logo: string | null;
+  bannerImage: string | null;
   rating: number;
-  reviews: number;
-  deliveryTime: string;
   deliveryFee: number;
   tags: string[];
   isOpen: boolean;
@@ -32,210 +26,122 @@ export interface Food {
   category: string;
   vendorId: string;
   vendorName: string;
-  emoji: string;
-  gradient: [string, string];
-  popular?: boolean;
-  soldOut?: boolean;
+  imageUrl: string | null;
+  soldOut: boolean;
 }
 
-export type OrderStatus =
-  | "placed"
-  | "accepted"
-  | "preparing"
-  | "ready"
-  | "assigned"
-  | "picked_up"
-  | "delivered";
+/** Mirrors the orders.status check constraint in Supabase. */
+export type OrderStatus = "pending" | "preparing" | "ready" | "completed" | "rejected";
 
 export interface ActiveOrder {
   id: string;
   vendorName: string;
   status: OrderStatus;
-  agentName: string;
-  agentPhone: string;
-  eta: string;
+  /** Set once a delivery agent has been assigned to the order. */
+  agentName: string | null;
+  agentPhone: string | null;
   itemsCount: number;
   total: number;
-  pin: string;
+  pin: string | null;
 }
 
-export const ORDER_STEPS: { status: OrderStatus; label: string }[] = [
-  { status: "placed", label: "Order Placed" },
-  { status: "accepted", label: "Vendor Accepted" },
-  { status: "preparing", label: "Preparing Food" },
-  { status: "ready", label: "Ready For Pickup" },
-  { status: "assigned", label: "Agent Assigned" },
-  { status: "picked_up", label: "Picked Up" },
-  { status: "delivered", label: "Delivered" },
+export const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
+  pending: "Order Placed",
+  preparing: "Preparing Food",
+  ready: "Ready for Pickup",
+  completed: "Delivered",
+  rejected: "Rejected",
+};
+
+export interface OrderStep {
+  key: string;
+  label: string;
+  state: "done" | "active" | "upcoming";
+}
+
+const ORDER_STEP_DEFS = [
+  { key: "placed", label: "Order Placed" },
+  { key: "preparing", label: "Preparing Food" },
+  { key: "ready", label: "Ready for Pickup" },
+  { key: "agent", label: "Agent Assigned" },
+  { key: "delivered", label: "Delivered" },
 ];
 
-export const CATEGORIES: Category[] = [
-  { id: "rice", name: "Rice", emoji: "🍚", color: "#FCD882" },
-  { id: "fast-food", name: "Fast Food", emoji: "🍔", color: "#FDE68A" },
-  { id: "drinks", name: "Drinks", emoji: "🥤", color: "#BAE6FD" },
-  { id: "snacks", name: "Snacks", emoji: "🍟", color: "#FBCFE8" },
-  { id: "swallow", name: "Swallow", emoji: "🍲", color: "#D9F99D" },
-  { id: "breakfast", name: "Breakfast", emoji: "🍳", color: "#FED7AA" },
+/**
+ * Derives the tracking timeline from the DB's 5-status model plus whether a
+ * delivery agent has been assigned — "Agent Assigned" has no DB status of
+ * its own, it's read off `delivery_agent_id` being set once status is "ready".
+ */
+export function buildOrderSteps(status: OrderStatus, hasAgent: boolean): OrderStep[] {
+  if (status === "rejected") {
+    return [
+      { key: "placed", label: "Order Placed", state: "done" },
+      { key: "rejected", label: "Order Rejected", state: "active" },
+    ];
+  }
+
+  let currentStage: number;
+  if (status === "completed") currentStage = 4;
+  else if (status === "ready") currentStage = hasAgent ? 3 : 2;
+  else if (status === "preparing") currentStage = 1;
+  else currentStage = 0;
+
+  return ORDER_STEP_DEFS.map((step, i) => ({
+    ...step,
+    state: i < currentStage ? "done" : i === currentStage ? "active" : "upcoming",
+  }));
+}
+
+/** Emoji + tint fallback for categories that don't have an `image` yet. */
+const CATEGORY_STYLE: Record<string, { emoji: string; color: string }> = {
+  rice: { emoji: "🍚", color: "#FCD882" },
+  "fast food": { emoji: "🍔", color: "#FDE68A" },
+  drinks: { emoji: "🥤", color: "#BAE6FD" },
+  snacks: { emoji: "🍟", color: "#FBCFE8" },
+  swallow: { emoji: "🍲", color: "#D9F99D" },
+  breakfast: { emoji: "🍳", color: "#FED7AA" },
+};
+const DEFAULT_CATEGORY_STYLE = { emoji: "🍽️", color: "#E5E7EB" };
+
+export function categoryStyle(name: string): { emoji: string; color: string } {
+  return CATEGORY_STYLE[name.toLowerCase()] ?? DEFAULT_CATEGORY_STYLE;
+}
+
+/** Generic gradient/emoji used wherever a vendor or food item has no photo yet. */
+export const PLACEHOLDER_GRADIENT: [string, string] = ["#00452E", "#016644"];
+
+interface OpeningHourEntry {
+  day: string;
+  open: string;
+  close: string;
+  closed: boolean;
+}
+
+const WEEKDAYS = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
 ];
 
-export const VENDORS: Vendor[] = [
-  {
-    id: "mamas-kitchen",
-    name: "Mama's Kitchen",
-    emoji: "🍛",
-    gradient: ["#00452E", "#016644"],
-    rating: 4.8,
-    reviews: 320,
-    deliveryTime: "15-25 min",
-    deliveryFee: 300,
-    tags: ["Rice", "Swallow", "Local"],
-    isOpen: true,
-  },
-  {
-    id: "campus-grill",
-    name: "Campus Grill",
-    emoji: "🍔",
-    gradient: ["#B04D0F", "#D97706"],
-    rating: 4.6,
-    reviews: 210,
-    deliveryTime: "20-30 min",
-    deliveryFee: 400,
-    tags: ["Fast Food", "Grills"],
-    isOpen: true,
-  },
-  {
-    id: "sip-and-bite",
-    name: "Sip & Bite",
-    emoji: "🥤",
-    gradient: ["#0369A1", "#0EA5E9"],
-    rating: 4.7,
-    reviews: 154,
-    deliveryTime: "10-20 min",
-    deliveryFee: 250,
-    tags: ["Drinks", "Snacks"],
-    isOpen: true,
-  },
-  {
-    id: "morning-fuel",
-    name: "Morning Fuel",
-    emoji: "🍳",
-    gradient: ["#7A5C00", "#D97706"],
-    rating: 4.5,
-    reviews: 98,
-    deliveryTime: "15-25 min",
-    deliveryFee: 300,
-    tags: ["Breakfast", "Tea"],
-    isOpen: false,
-  },
-];
+/** Whether a vendor is open right now, based on their opening_hours jsonb. */
+export function isVendorOpenNow(openingHours: unknown): boolean {
+  if (!Array.isArray(openingHours)) return true;
+  const now = new Date();
+  const today = WEEKDAYS[now.getDay()];
+  const entry = (openingHours as OpeningHourEntry[]).find((h) => h.day === today);
+  if (!entry || entry.closed) return false;
 
-export const FOODS: Food[] = [
-  {
-    id: "jollof-rice-chicken",
-    name: "Jollof Rice & Chicken",
-    price: 2500,
-    description: "Smoky party jollof with grilled chicken and fried plantain.",
-    category: "Rice",
-    vendorId: "mamas-kitchen",
-    vendorName: "Mama's Kitchen",
-    emoji: "🍚",
-    gradient: ["#00452E", "#016644"],
-    popular: true,
-  },
-  {
-    id: "fried-rice-combo",
-    name: "Fried Rice Combo",
-    price: 2800,
-    description: "Veggie fried rice, turkey and coleslaw.",
-    category: "Rice",
-    vendorId: "mamas-kitchen",
-    vendorName: "Mama's Kitchen",
-    emoji: "🍛",
-    gradient: ["#166534", "#22C55E"],
-  },
-  {
-    id: "double-cheeseburger",
-    name: "Double Cheeseburger",
-    price: 3200,
-    description: "Two beef patties, melted cheese and house sauce.",
-    category: "Fast Food",
-    vendorId: "campus-grill",
-    vendorName: "Campus Grill",
-    emoji: "🍔",
-    gradient: ["#B04D0F", "#F59E0B"],
-    popular: true,
-  },
-  {
-    id: "loaded-fries",
-    name: "Loaded Fries",
-    price: 1800,
-    description: "Crispy fries topped with cheese sauce and beef strips.",
-    category: "Snacks",
-    vendorId: "campus-grill",
-    vendorName: "Campus Grill",
-    emoji: "🍟",
-    gradient: ["#9A3412", "#FB923C"],
-  },
-  {
-    id: "chapman",
-    name: "Chilled Chapman",
-    price: 1200,
-    description: "Classic Nigerian cocktail, served ice cold.",
-    category: "Drinks",
-    vendorId: "sip-and-bite",
-    vendorName: "Sip & Bite",
-    emoji: "🍹",
-    gradient: ["#0369A1", "#38BDF8"],
-    popular: true,
-  },
-  {
-    id: "shawarma",
-    name: "Beef Shawarma",
-    price: 2200,
-    description: "Loaded beef shawarma with sausage and extra sauce.",
-    category: "Fast Food",
-    vendorId: "sip-and-bite",
-    vendorName: "Sip & Bite",
-    emoji: "🌯",
-    gradient: ["#155E75", "#22D3EE"],
-  },
-  {
-    id: "pancakes-stack",
-    name: "Pancake Stack",
-    price: 1500,
-    description: "Fluffy pancakes with syrup and a side of eggs.",
-    category: "Breakfast",
-    vendorId: "morning-fuel",
-    vendorName: "Morning Fuel",
-    emoji: "🥞",
-    gradient: ["#7A5C00", "#F59E0B"],
-  },
-  {
-    id: "pounded-yam-egusi",
-    name: "Pounded Yam & Egusi",
-    price: 2700,
-    description: "Smooth pounded yam with rich egusi and assorted meat.",
-    category: "Swallow",
-    vendorId: "mamas-kitchen",
-    vendorName: "Mama's Kitchen",
-    emoji: "🍲",
-    gradient: ["#3F6212", "#84CC16"],
-  },
-];
-
-export const ACTIVE_ORDERS: ActiveOrder[] = [
-  {
-    id: "BF-10293",
-    vendorName: "Mama's Kitchen",
-    status: "preparing",
-    agentName: "David Okon",
-    agentPhone: "+234 801 234 5678",
-    eta: "18 min",
-    itemsCount: 3,
-    total: 6100,
-    pin: "4821",
-  },
-];
+  const minutesNow = now.getHours() * 60 + now.getMinutes();
+  const [openH, openM] = entry.open.split(":").map(Number);
+  const [closeH, closeM] = entry.close.split(":").map(Number);
+  const openMinutes = openH * 60 + openM;
+  const closeMinutes = closeH * 60 + closeM;
+  return minutesNow >= openMinutes && minutesNow < closeMinutes;
+}
 
 /** Order-of-magnitude fees used across cart/checkout. */
 export const SERVICE_CHARGE = 150;
@@ -244,4 +150,97 @@ export const PLATFORM_FEE = 100;
 /** Format a kobo-free Naira amount, e.g. 2500 -> "₦2,500". */
 export function formatNaira(amount: number): string {
   return `₦${amount.toLocaleString("en-NG")}`;
+}
+
+// ---------------------------------------------------------------------------
+// Row mappers — shared shape between dashboard, explore, vendor-store and
+// orders screens so each one doesn't redefine the same Supabase row→view
+// model mapping.
+// ---------------------------------------------------------------------------
+
+export const VENDOR_COLUMNS =
+  "id, business_name, logo, banner_image, rating, delivery_fee, tags, opening_hours";
+
+export interface RawVendorRow {
+  id: string;
+  business_name: string | null;
+  logo: string | null;
+  banner_image: string | null;
+  rating: number | null;
+  delivery_fee: number | null;
+  tags: string[] | null;
+  opening_hours: unknown;
+}
+
+export function toVendor(row: RawVendorRow): Vendor {
+  return {
+    id: row.id,
+    name: row.business_name ?? "Vendor",
+    logo: row.logo,
+    bannerImage: row.banner_image,
+    rating: Number(row.rating ?? 0),
+    deliveryFee: Number(row.delivery_fee ?? 0),
+    tags: row.tags ?? [],
+    isOpen: isVendorOpenNow(row.opening_hours),
+  };
+}
+
+export const FOOD_COLUMNS =
+  "id, name, price, description, image_url, available, vendor_id, food_categories(name), vendors(business_name)";
+
+export interface RawFoodRow {
+  id: string;
+  name: string | null;
+  price: number | null;
+  description: string | null;
+  image_url: string | null;
+  available: boolean | null;
+  vendor_id: string | null;
+  food_categories: { name: string } | null;
+  vendors: { business_name: string | null } | null;
+}
+
+export function toFood(row: RawFoodRow): Food {
+  return {
+    id: row.id,
+    name: row.name ?? "",
+    price: Number(row.price ?? 0),
+    description: row.description ?? "",
+    category: row.food_categories?.name ?? "Other",
+    vendorId: row.vendor_id ?? "",
+    vendorName: row.vendors?.business_name ?? "Vendor",
+    imageUrl: row.image_url,
+    soldOut: !(row.available ?? true),
+  };
+}
+
+export const ACTIVE_ORDER_COLUMNS =
+  "id, status, total_amount, vendors(business_name), order_items(quantity), delivery_agents(profiles(full_name, phone_number))";
+
+export interface RawOrderRow {
+  id: string;
+  status: string | null;
+  total_amount: number | null;
+  vendors: { business_name: string | null } | null;
+  order_items: { quantity: number | null }[] | null;
+  delivery_agents: {
+    profiles: { full_name: string | null; phone_number: string | null } | null;
+  } | null;
+}
+
+export function toActiveOrder(row: RawOrderRow): ActiveOrder {
+  const itemsCount = (row.order_items ?? []).reduce(
+    (sum, item) => sum + (item.quantity ?? 0),
+    0,
+  );
+  return {
+    id: row.id,
+    vendorName: row.vendors?.business_name ?? "Vendor",
+    status: (row.status ?? "pending") as OrderStatus,
+    agentName: row.delivery_agents?.profiles?.full_name ?? null,
+    agentPhone: row.delivery_agents?.profiles?.phone_number ?? null,
+    itemsCount,
+    total: Number(row.total_amount ?? 0),
+    pin: null,
+  };
 }

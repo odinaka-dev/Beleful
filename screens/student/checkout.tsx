@@ -11,6 +11,8 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { formatNaira } from "@/helpers/student.helpers";
 import { HOSTELS } from "@/helpers/auth.helpers";
 import { useCart } from "@/provider/cart-provider";
+import { createClient } from "@/lib/supabase/client";
+import { initiatePayment } from "@/lib/payments/paystack";
 import { cn } from "@/lib/utils";
 
 type PaymentMethod = "card" | "wallet";
@@ -21,9 +23,9 @@ export default function CheckoutPage() {
   const router = useRouter();
   const [method, setMethod] = React.useState<PaymentMethod>("card");
   const [placing, setPlacing] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
   const [delivery, setDelivery] = React.useState({
     hostel: "",
-    building: "",
     landmark: "",
   });
 
@@ -38,14 +40,41 @@ export default function CheckoutPage() {
     );
   }
 
-  function placeOrder(e: React.FormEvent) {
+  async function placeOrder(e: React.FormEvent) {
     e.preventDefault();
     setPlacing(true);
-    // Mock order placement → route to tracking for the seeded active order.
-    setTimeout(() => {
-      clear();
-      router.push("/user-dashboard/orders/BF-10293");
-    }, 1100);
+    setError(null);
+
+    const vendorId = items[0].menuItem.vendorId;
+    const supabase = createClient();
+
+    // Prices are recomputed server-side inside create_order from the live
+    // menu_items table — the client only supplies item ids/quantities, so a
+    // tampered request can't under-price an order.
+    const { data, error: orderError } = await supabase
+      .rpc("create_order", {
+        p_vendor_id: vendorId,
+        p_hostel: delivery.hostel,
+        p_landmark: delivery.landmark,
+        p_items: items.map((i) => ({ menu_item_id: i.menuItem.id, quantity: i.qty })),
+      })
+      .single();
+
+    if (orderError || !data) {
+      setError(orderError?.message ?? "Could not place order.");
+      setPlacing(false);
+      return;
+    }
+
+    const payment = await initiatePayment(data.id, data.total_amount);
+    if (!payment.ok) {
+      setError(payment.error ?? "Payment could not be processed.");
+      setPlacing(false);
+      return;
+    }
+
+    await clear();
+    router.push(`/user-dashboard/orders/${data.id}`);
   }
 
   return (
@@ -53,6 +82,12 @@ export default function CheckoutPage() {
       <h1 className="mb-6 font-heading text-2xl font-bold text-[#111111]">
         Checkout
       </h1>
+
+      {error && (
+        <p className="mb-4 rounded-xl bg-[#FEE2E2] px-4 py-3 text-sm font-medium text-[#DC2626]">
+          {error}
+        </p>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-[1fr_360px] lg:items-start">
         <div className="flex flex-col gap-6">
@@ -73,17 +108,8 @@ export default function CheckoutPage() {
                 }
               />
               <FormField
-                label="Building / Room"
-                placeholder="Block C, Room 214"
-                required
-                value={delivery.building}
-                onChange={(e) =>
-                  setDelivery({ ...delivery, building: e.target.value })
-                }
-              />
-              <FormField
-                label="Landmark"
-                placeholder="Near the main gate"
+                label="Building / Room / Landmark"
+                placeholder="Block C, Room 214, near the main gate"
                 optional
                 value={delivery.landmark}
                 onChange={(e) =>
