@@ -9,7 +9,9 @@ import { PasswordField } from "@/components/form/password-field";
 import { SelectField } from "@/components/form/select-field";
 import { FileUpload } from "@/components/form/file-upload";
 import { PrimaryButton } from "@/components/ui/primary-button";
+import { CheckEmailNotice } from "@/components/auth/check-email-notice";
 import { SCHOOLS } from "@/helpers/auth.helpers";
+import { signUpWithRole } from "@/lib/auth/sign-up";
 
 interface VendorForm {
   businessName: string;
@@ -37,14 +39,39 @@ const EMPTY: VendorForm = {
 export default function VendorRegisterPage() {
   const [form, setForm] = useState<VendorForm>(EMPTY);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
 
   const set = (key: keyof VendorForm) => (e: { target: { value: string } }) =>
     setForm((f) => ({ ...f, [key]: e.target.value }));
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => setLoading(false), 900);
+    setError(null);
+
+    const { error: signUpError } = await signUpWithRole(
+      form.email,
+      form.password,
+      "VENDOR",
+      {
+        full_name: form.vendorName,
+        phone_number: form.phone,
+        school: form.school,
+        business_name: form.businessName,
+        address: form.address,
+        cac_number: form.cac,
+      },
+    );
+
+    setLoading(false);
+
+    if (signUpError) {
+      setError(signUpError);
+      return;
+    }
+
+    setSubmitted(true);
   }
 
   return (
@@ -64,7 +91,16 @@ export default function VendorRegisterPage() {
         </>
       }
     >
+      {submitted ? (
+        <CheckEmailNotice email={form.email} />
+      ) : (
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        {error && (
+          <p className="rounded-xl bg-[#FEE2E2] px-4 py-3 text-sm font-medium text-[#DC2626]">
+            {error}
+          </p>
+        )}
+
         <FormField
           label="Business name"
           placeholder="Mama's Kitchen"
@@ -156,6 +192,7 @@ export default function VendorRegisterPage() {
           Create vendor account
         </PrimaryButton>
       </form>
+      )}
     </AuthShell>
   );
 }

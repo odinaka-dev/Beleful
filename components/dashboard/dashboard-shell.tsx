@@ -4,9 +4,10 @@ import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { HamburgerMenu, CloseSquare, LogoutCurve } from "iconsax-reactjs";
+import { HamburgerMenu, CloseSquare } from "iconsax-reactjs";
 import type { Icon } from "iconsax-reactjs";
 import { BelefulImages } from "@/constant/image";
+import { SignOutButton } from "@/components/auth/sign-out-button";
 import { cn } from "@/lib/utils";
 
 export interface DashboardNavItem {
@@ -29,6 +30,8 @@ interface DashboardShellProps {
   user: DashboardUser;
   /** Where the brand logo links to (usually the dashboard home). */
   brandHref: string;
+  /** Login page to return to after signing out. */
+  logoutHref: string;
   children: React.ReactNode;
 }
 
@@ -40,6 +43,7 @@ export function DashboardShell({
   navItems,
   user,
   brandHref,
+  logoutHref,
   children,
 }: DashboardShellProps) {
   const pathname = usePathname() ?? "";
@@ -96,13 +100,7 @@ export function DashboardShell({
             </p>
             <p className="truncate text-xs text-[#666666]">{user.role}</p>
           </div>
-          <Link
-            href="/login"
-            aria-label="Log out"
-            className="grid h-8 w-8 place-items-center rounded-lg text-[#666666] transition-colors hover:bg-[#FEE2E2] hover:text-[#DC2626]"
-          >
-            <LogoutCurve size={18} variant="TwoTone" />
-          </Link>
+          <SignOutButton redirectTo={logoutHref} className="h-8 w-8" />
         </div>
       </div>
     </div>

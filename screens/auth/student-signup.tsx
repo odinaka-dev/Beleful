@@ -9,7 +9,9 @@ import { PasswordField } from "@/components/form/password-field";
 import { SelectField } from "@/components/form/select-field";
 import { CheckboxField } from "@/components/form/checkbox-field";
 import { PrimaryButton } from "@/components/ui/primary-button";
+import { CheckEmailNotice } from "@/components/auth/check-email-notice";
 import { SCHOOLS, HOSTELS } from "@/helpers/auth.helpers";
+import { signUpWithRole } from "@/lib/auth/sign-up";
 
 interface StudentForm {
   fullName: string;
@@ -36,6 +38,8 @@ export default function StudentSignupPage() {
   const [form, setForm] = useState<StudentForm>(EMPTY);
   const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
 
   const set = (key: keyof StudentForm) => (e: { target: { value: string } }) =>
     setForm((f) => ({ ...f, [key]: e.target.value }));
@@ -43,11 +47,32 @@ export default function StudentSignupPage() {
   const mismatch =
     !!form.confirmPassword && form.password !== form.confirmPassword;
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (mismatch || !agreed) return;
     setLoading(true);
-    setTimeout(() => setLoading(false), 900);
+    setError(null);
+
+    const { error: signUpError } = await signUpWithRole(
+      form.email,
+      form.password,
+      "USER",
+      {
+        full_name: form.fullName,
+        phone_number: form.phone,
+        school: form.school,
+        hostel: form.hostel,
+      },
+    );
+
+    setLoading(false);
+
+    if (signUpError) {
+      setError(signUpError);
+      return;
+    }
+
+    setSubmitted(true);
   }
 
   return (
@@ -67,7 +92,16 @@ export default function StudentSignupPage() {
         </>
       }
     >
+      {submitted ? (
+        <CheckEmailNotice email={form.email} />
+      ) : (
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        {error && (
+          <p className="rounded-xl bg-[#FEE2E2] px-4 py-3 text-sm font-medium text-[#DC2626]">
+            {error}
+          </p>
+        )}
+
         <FormField
           label="Full name"
           placeholder="Ada Okeke"
@@ -154,6 +188,7 @@ export default function StudentSignupPage() {
           Continue
         </PrimaryButton>
       </form>
+      )}
     </AuthShell>
   );
 }

@@ -17,8 +17,13 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-shell";
 import { Card } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { PrimaryButton } from "@/components/ui/primary-button";
+import { FileUpload } from "@/components/form/file-upload";
 import { AGENT_PROFILE } from "@/helpers/agent.helpers";
+import { createClient } from "@/lib/supabase/client";
+import { uploadOwnFile } from "@/lib/storage/upload";
 import type { Icon } from "iconsax-reactjs";
+
+type ImageStatus = "idle" | "uploading" | "saved" | "error";
 
 function InfoRow({
   icon: RowIcon,
@@ -70,6 +75,122 @@ export default function AgentProfile() {
     .map((n) => n[0])
     .join("");
 
+  const [editing, setEditing] = React.useState(false);
+  const [avatarUrl, setAvatarUrl] = React.useState<string | null>(null);
+  const [idDocSignedUrl, setIdDocSignedUrl] = React.useState<string | null>(
+    null,
+  );
+  const [avatarStatus, setAvatarStatus] = React.useState<ImageStatus>("idle");
+  const [idStatus, setIdStatus] = React.useState<ImageStatus>("idle");
+  const [avatarError, setAvatarError] = React.useState<string | null>(null);
+  const [idError, setIdError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    let active = true;
+    (async () => {
+      const supabase = createClient();
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) return;
+
+      const [{ data: profile }, { data: agent }] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("avatar_url")
+          .eq("id", userData.user.id)
+          .single(),
+        supabase
+          .from("delivery_agents")
+          .select("student_id_image")
+          .eq("user_id", userData.user.id)
+          .single(),
+      ]);
+
+      if (!active) return;
+      if (profile?.avatar_url) setAvatarUrl(profile.avatar_url);
+
+      if (agent?.student_id_image) {
+        const { data: signed } = await supabase.storage
+          .from("agent-documents")
+          .createSignedUrl(agent.student_id_image, 60 * 10);
+        if (active && signed) setIdDocSignedUrl(signed.signedUrl);
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  async function handleAvatarChange(file: File | null) {
+    if (!file) return;
+    setAvatarStatus("uploading");
+    setAvatarError(null);
+
+    const { data, error } = await uploadOwnFile("avatars", file);
+    if (error || !data) {
+      setAvatarStatus("error");
+      setAvatarError(error ?? "Upload failed.");
+      return;
+    }
+
+    const supabase = createClient();
+    const { data: userData } = await supabase.auth.getUser();
+    if (!userData.user) {
+      setAvatarStatus("error");
+      setAvatarError("You must be signed in.");
+      return;
+    }
+    const { error: updateError } = await supabase
+      .from("profiles")
+      .update({ avatar_url: data.publicUrl })
+      .eq("id", userData.user.id);
+
+    if (updateError) {
+      setAvatarStatus("error");
+      setAvatarError(updateError.message);
+      return;
+    }
+
+    setAvatarUrl(data.publicUrl);
+    setAvatarStatus("saved");
+  }
+
+  async function handleIdChange(file: File | null) {
+    if (!file) return;
+    setIdStatus("uploading");
+    setIdError(null);
+
+    const { data, error } = await uploadOwnFile("agent-documents", file);
+    if (error || !data) {
+      setIdStatus("error");
+      setIdError(error ?? "Upload failed.");
+      return;
+    }
+
+    const supabase = createClient();
+    const { data: userData } = await supabase.auth.getUser();
+    if (!userData.user) {
+      setIdStatus("error");
+      setIdError("You must be signed in.");
+      return;
+    }
+    const { error: updateError } = await supabase
+      .from("delivery_agents")
+      .update({ student_id_image: data.path })
+      .eq("user_id", userData.user.id);
+
+    if (updateError) {
+      setIdStatus("error");
+      setIdError(updateError.message);
+      return;
+    }
+
+    const { data: signed } = await supabase.storage
+      .from("agent-documents")
+      .createSignedUrl(data.path, 60 * 10);
+    setIdDocSignedUrl(signed?.signedUrl ?? null);
+    setIdStatus("saved");
+  }
+
   return (
     <div>
       <DashboardHeader title="Profile" subtitle="Your agent account details." />
@@ -77,9 +198,17 @@ export default function AgentProfile() {
       <div className="grid gap-6 lg:grid-cols-[360px_1fr] lg:items-start">
         {/* Identity + verification */}
         <Card className="flex flex-col items-center text-center">
-          <span className="grid h-24 w-24 place-items-center rounded-3xl bg-[#00452E] font-heading text-3xl font-bold text-white">
-            {initials}
-          </span>
+          {avatarUrl ? (
+            <img
+              src={avatarUrl}
+              alt={p.name}
+              className="h-24 w-24 rounded-3xl object-cover"
+            />
+          ) : (
+            <span className="grid h-24 w-24 place-items-center rounded-3xl bg-[#00452E] font-heading text-3xl font-bold text-white">
+              {initials}
+            </span>
+          )}
           <h2 className="mt-4 font-heading text-xl font-bold text-[#111111]">
             {p.name}
           </h2>
@@ -102,9 +231,67 @@ export default function AgentProfile() {
             <span className="font-semibold text-[#111111]">{p.joined}</span>
           </div>
 
-          <PrimaryButton variant="outline" className="mt-5">
-            Edit profile
+          <PrimaryButton
+            variant="outline"
+            className="mt-5"
+            onClick={() => setEditing((v) => !v)}
+          >
+            {editing ? "Close" : "Edit profile"}
           </PrimaryButton>
+
+          {editing && (
+            <div className="mt-5 grid w-full gap-5 text-left">
+              <div>
+                <FileUpload
+                  label="Profile photo"
+                  variant="avatar"
+                  hint="Clear, recent photo of you"
+                  initialPreviewUrl={avatarUrl}
+                  onFileChange={handleAvatarChange}
+                />
+                {avatarStatus === "uploading" && (
+                  <p className="mt-1.5 text-xs font-medium text-[#666666]">
+                    Uploading…
+                  </p>
+                )}
+                {avatarStatus === "saved" && (
+                  <p className="mt-1.5 text-xs font-medium text-[#00452E]">
+                    Saved
+                  </p>
+                )}
+                {avatarStatus === "error" && (
+                  <p className="mt-1.5 text-xs font-medium text-[#DC2626]">
+                    {avatarError}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <FileUpload
+                  label="Student ID card"
+                  variant="document"
+                  hint="Only you and BELEFUL admins can view this"
+                  initialPreviewUrl={idDocSignedUrl}
+                  onFileChange={handleIdChange}
+                />
+                {idStatus === "uploading" && (
+                  <p className="mt-1.5 text-xs font-medium text-[#666666]">
+                    Uploading…
+                  </p>
+                )}
+                {idStatus === "saved" && (
+                  <p className="mt-1.5 text-xs font-medium text-[#00452E]">
+                    Saved
+                  </p>
+                )}
+                {idStatus === "error" && (
+                  <p className="mt-1.5 text-xs font-medium text-[#DC2626]">
+                    {idError}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
         </Card>
 
         <div className="flex flex-col gap-6">

@@ -14,11 +14,116 @@ import {
   OPENING_HOURS,
   type OpeningHour,
 } from "@/helpers/vendor.helpers";
+import { createClient } from "@/lib/supabase/client";
+import { uploadOwnFile } from "@/lib/storage/upload";
+
+type ImageStatus = "idle" | "uploading" | "saved" | "error";
 
 /** Vendor profile settings: logo/banner, business details, opening hours. */
 export default function VendorSettings() {
   const [profile, setProfile] = React.useState(VENDOR_PROFILE);
   const [hours, setHours] = React.useState<OpeningHour[]>(OPENING_HOURS);
+
+  const [logoUrl, setLogoUrl] = React.useState<string | null>(null);
+  const [bannerUrl, setBannerUrl] = React.useState<string | null>(null);
+  const [logoStatus, setLogoStatus] = React.useState<ImageStatus>("idle");
+  const [bannerStatus, setBannerStatus] = React.useState<ImageStatus>("idle");
+  const [logoError, setLogoError] = React.useState<string | null>(null);
+  const [bannerError, setBannerError] = React.useState<string | null>(null);
+
+  // Load the vendor's current logo/banner so the upload controls show what's
+  // already saved, not a blank state. Business details/opening hours stay on
+  // mock data for now — that's the next pass (full vendor dashboard wiring).
+  React.useEffect(() => {
+    let active = true;
+    (async () => {
+      const supabase = createClient();
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) return;
+
+      const { data: vendor } = await supabase
+        .from("vendors")
+        .select("logo, banner_image")
+        .eq("user_id", userData.user.id)
+        .single();
+
+      if (active && vendor) {
+        setLogoUrl(vendor.logo);
+        setBannerUrl(vendor.banner_image);
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  async function handleLogoChange(file: File | null) {
+    if (!file) return;
+    setLogoStatus("uploading");
+    setLogoError(null);
+
+    const { data, error } = await uploadOwnFile("vendor-media", file);
+    if (error || !data) {
+      setLogoStatus("error");
+      setLogoError(error ?? "Upload failed.");
+      return;
+    }
+
+    const supabase = createClient();
+    const { data: userData } = await supabase.auth.getUser();
+    if (!userData.user) {
+      setLogoStatus("error");
+      setLogoError("You must be signed in.");
+      return;
+    }
+    const { error: updateError } = await supabase
+      .from("vendors")
+      .update({ logo: data.publicUrl })
+      .eq("user_id", userData.user.id);
+
+    if (updateError) {
+      setLogoStatus("error");
+      setLogoError(updateError.message);
+      return;
+    }
+
+    setLogoUrl(data.publicUrl);
+    setLogoStatus("saved");
+  }
+
+  async function handleBannerChange(file: File | null) {
+    if (!file) return;
+    setBannerStatus("uploading");
+    setBannerError(null);
+
+    const { data, error } = await uploadOwnFile("vendor-media", file);
+    if (error || !data) {
+      setBannerStatus("error");
+      setBannerError(error ?? "Upload failed.");
+      return;
+    }
+
+    const supabase = createClient();
+    const { data: userData } = await supabase.auth.getUser();
+    if (!userData.user) {
+      setBannerStatus("error");
+      setBannerError("You must be signed in.");
+      return;
+    }
+    const { error: updateError } = await supabase
+      .from("vendors")
+      .update({ banner_image: data.publicUrl })
+      .eq("user_id", userData.user.id);
+
+    if (updateError) {
+      setBannerStatus("error");
+      setBannerError(updateError.message);
+      return;
+    }
+
+    setBannerUrl(data.publicUrl);
+    setBannerStatus("saved");
+  }
 
   const set = (key: keyof typeof profile) => (e: { target: { value: string } }) =>
     setProfile((p) => ({ ...p, [key]: e.target.value }));
@@ -49,12 +154,54 @@ export default function VendorSettings() {
             Branding
           </h2>
           <div className="grid gap-5 sm:grid-cols-[auto_1fr] sm:items-start">
-            <FileUpload label="Logo" variant="avatar" hint="Square PNG/JPG" />
-            <FileUpload
-              label="Banner image"
-              variant="banner"
-              hint="Shown at the top of your store"
-            />
+            <div>
+              <FileUpload
+                label="Logo"
+                variant="avatar"
+                hint="Square PNG/JPG"
+                initialPreviewUrl={logoUrl}
+                onFileChange={handleLogoChange}
+              />
+              {logoStatus === "uploading" && (
+                <p className="mt-1.5 text-xs font-medium text-[#666666]">
+                  Uploading…
+                </p>
+              )}
+              {logoStatus === "saved" && (
+                <p className="mt-1.5 text-xs font-medium text-[#00452E]">
+                  Saved
+                </p>
+              )}
+              {logoStatus === "error" && (
+                <p className="mt-1.5 text-xs font-medium text-[#DC2626]">
+                  {logoError}
+                </p>
+              )}
+            </div>
+            <div>
+              <FileUpload
+                label="Banner image"
+                variant="banner"
+                hint="Shown at the top of your store"
+                initialPreviewUrl={bannerUrl}
+                onFileChange={handleBannerChange}
+              />
+              {bannerStatus === "uploading" && (
+                <p className="mt-1.5 text-xs font-medium text-[#666666]">
+                  Uploading…
+                </p>
+              )}
+              {bannerStatus === "saved" && (
+                <p className="mt-1.5 text-xs font-medium text-[#00452E]">
+                  Saved
+                </p>
+              )}
+              {bannerStatus === "error" && (
+                <p className="mt-1.5 text-xs font-medium text-[#DC2626]">
+                  {bannerError}
+                </p>
+              )}
+            </div>
           </div>
         </Card>
 

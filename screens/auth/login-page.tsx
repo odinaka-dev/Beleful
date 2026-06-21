@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Sms } from "iconsax-reactjs";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { FormField } from "@/components/form/form-field";
@@ -9,17 +10,35 @@ import { PasswordField } from "@/components/form/password-field";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { SocialButton } from "@/components/ui/social-button";
 import { OrDivider } from "@/components/auth/or-divider";
+import { signInWithRole } from "@/lib/auth/sign-in";
+import { ROLE_DASHBOARD_PATH } from "@/lib/auth/roles";
 
 /** Student login. */
 export default function StudentLoginPage() {
+  const router = useRouter();
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    // Mock auth — real Supabase call wired later.
-    setTimeout(() => setLoading(false), 900);
+    setError(null);
+
+    const { error: signInError } = await signInWithRole(
+      form.email,
+      form.password,
+      "USER",
+    );
+
+    if (signInError) {
+      setError(signInError);
+      setLoading(false);
+      return;
+    }
+
+    router.push(ROLE_DASHBOARD_PATH.USER);
+    router.refresh();
   }
 
   return (
@@ -40,6 +59,12 @@ export default function StudentLoginPage() {
       }
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        {error && (
+          <p className="rounded-xl bg-[#FEE2E2] px-4 py-3 text-sm font-medium text-[#DC2626]">
+            {error}
+          </p>
+        )}
+
         <FormField
           label="Email"
           type="email"

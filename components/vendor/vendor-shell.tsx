@@ -19,6 +19,7 @@ export function VendorShell({ children }: { children: React.ReactNode }) {
     <DashboardShell
       navItems={NAV}
       brandHref="/vendor-dashboard"
+      logoutHref="/vendor/login"
       user={{ name: VENDOR_PROFILE.businessName, role: "Food Vendor" }}
     >
       {children}
