@@ -10,6 +10,7 @@ import {
   ShoppingCart,
   ArrowLeft2,
   ArrowDown2,
+  Profile,
 } from "iconsax-reactjs";
 import { BelefulImages } from "@/constant/image";
 import { useCart } from "@/provider/cart-provider";
@@ -103,6 +104,14 @@ export function StudentTopNav() {
               {count}
             </span>
           )}
+        </Link>
+
+        <Link
+          href="/user-dashboard/profile"
+          aria-label="View profile"
+          className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-2xl bg-[#00452E]/5 text-[#00452E] transition-colors hover:bg-[#00452E]/10"
+        >
+          <Profile size={20} variant={pathname.startsWith("/user-dashboard/profile") ? "Bold" : "TwoTone"} />
         </Link>
 
         <SignOutButton
