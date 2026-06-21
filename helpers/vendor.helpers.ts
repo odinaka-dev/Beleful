@@ -32,6 +32,18 @@ export interface VendorOrder {
   time: string;
 }
 
+/** Formats an ISO timestamp as a short relative time, e.g. "2 min ago". */
+export function formatRelativeTime(isoDate: string): string {
+  const seconds = Math.max(0, (Date.now() - new Date(isoDate).getTime()) / 1000);
+  if (seconds < 60) return "Just now";
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes} min ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} hr${hours === 1 ? "" : "s"} ago`;
+  const days = Math.floor(hours / 24);
+  return `${days} day${days === 1 ? "" : "s"} ago`;
+}
+
 export type MenuItemStatus = "available" | "sold_out";
 
 export interface MenuItem {
@@ -60,81 +72,6 @@ export interface OpeningHour {
   close: string;
   closed: boolean;
 }
-
-export const VENDOR_METRICS: VendorMetrics = {
-  revenueToday: 86400,
-  ordersToday: 34,
-  pendingOrders: 5,
-  activeMenuItems: 18,
-};
-
-export const REVENUE_TREND: TrendPoint[] = [
-  { label: "Mon", value: 52000 },
-  { label: "Tue", value: 61000 },
-  { label: "Wed", value: 48000 },
-  { label: "Thu", value: 73000 },
-  { label: "Fri", value: 91000 },
-  { label: "Sat", value: 120000 },
-  { label: "Sun", value: 86400 },
-];
-
-export const ORDER_TREND: TrendPoint[] = [
-  { label: "Mon", value: 21 },
-  { label: "Tue", value: 26 },
-  { label: "Wed", value: 19 },
-  { label: "Thu", value: 30 },
-  { label: "Fri", value: 38 },
-  { label: "Sat", value: 47 },
-  { label: "Sun", value: 34 },
-];
-
-export const RECENT_ORDERS: VendorOrder[] = [
-  {
-    id: "BF-10321",
-    customer: "Ada Okeke",
-    items: "Jollof Rice & Chicken ×2",
-    itemsCount: 2,
-    total: 5000,
-    status: "pending",
-    time: "2 min ago",
-  },
-  {
-    id: "BF-10320",
-    customer: "Tunde Bello",
-    items: "Pounded Yam & Egusi",
-    itemsCount: 1,
-    total: 2700,
-    status: "pending",
-    time: "6 min ago",
-  },
-  {
-    id: "BF-10319",
-    customer: "Chioma Eze",
-    items: "Fried Rice Combo ×2, Chapman",
-    itemsCount: 3,
-    total: 6800,
-    status: "preparing",
-    time: "12 min ago",
-  },
-  {
-    id: "BF-10318",
-    customer: "Musa Ibrahim",
-    items: "Beef Shawarma",
-    itemsCount: 1,
-    total: 2200,
-    status: "preparing",
-    time: "18 min ago",
-  },
-  {
-    id: "BF-10317",
-    customer: "Grace John",
-    items: "Pancake Stack, Tea",
-    itemsCount: 2,
-    total: 2300,
-    status: "completed",
-    time: "34 min ago",
-  },
-];
 
 export const MENU_ITEMS: MenuItem[] = [
   {
