@@ -11,6 +11,7 @@ import { PrimaryButton } from "@/components/ui/primary-button";
 import { SocialButton } from "@/components/ui/social-button";
 import { OrDivider } from "@/components/auth/or-divider";
 import { signInWithRole } from "@/lib/auth/sign-in";
+import { signInWithGoogle } from "@/lib/auth/sign-in-with-google";
 import { ROLE_DASHBOARD_PATH } from "@/lib/auth/roles";
 
 /** Student login. */
@@ -18,7 +19,21 @@ export default function StudentLoginPage() {
   const router = useRouter();
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  async function handleGoogle() {
+    setGoogleLoading(true);
+    setError(null);
+
+    const { error: googleError } = await signInWithGoogle("USER");
+
+    // On success the browser navigates to Google, so we only get here on error.
+    if (googleError) {
+      setError(googleError);
+      setGoogleLoading(false);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -100,7 +115,12 @@ export default function StudentLoginPage() {
 
         <OrDivider />
 
-        <SocialButton />
+        <SocialButton
+          onClick={handleGoogle}
+          disabled={googleLoading || loading}
+        >
+          {googleLoading ? "Connecting…" : "Continue with Google"}
+        </SocialButton>
       </form>
     </AuthShell>
   );
