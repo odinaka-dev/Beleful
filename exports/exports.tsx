@@ -26,3 +26,9 @@ export { default as OrderTrackingPage } from "@/screens/student/order-tracking";
 export { default as AgentDashboard } from "@/screens/agent/dashboard";
 export { default as AgentEarnings } from "@/screens/agent/earnings";
 export { default as AgentProfile } from "@/screens/agent/profile";
+
+// vendor dashboard imports goes here
+export { default as VendorDashboard } from "@/screens/vendor/dashboard";
+export { default as VendorMenu } from "@/screens/vendor/menu";
+export { default as VendorWallet } from "@/screens/vendor/wallet";
+export { default as VendorSettings } from "@/screens/vendor/settings";
