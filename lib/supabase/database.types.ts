@@ -476,6 +476,14 @@ export type Database = {
     Functions: {
       current_agent_id: { Args: never; Returns: string }
       current_vendor_id: { Args: never; Returns: string }
+      get_vendor_daily_stats: {
+        Args: { days_back?: number }
+        Returns: {
+          day: string
+          order_count: number
+          revenue: number
+        }[]
+      }
       is_admin: { Args: never; Returns: boolean }
     }
     Enums: {

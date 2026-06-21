@@ -30,7 +30,7 @@ export function TrendChart({
         return (
           <div
             key={point.label}
-            className="group flex flex-1 flex-col items-center justify-end gap-2"
+            className="group flex h-full flex-1 flex-col items-center justify-end gap-2"
           >
             {/* Value label on hover */}
             <span className="rounded-md bg-[#111111] px-1.5 py-0.5 text-[10px] font-semibold text-white opacity-0 transition-opacity group-hover:opacity-100">
