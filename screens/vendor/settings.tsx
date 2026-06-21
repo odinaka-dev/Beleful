@@ -170,7 +170,7 @@ export default function VendorSettings() {
     setLogoStatus("uploading");
     setLogoError(null);
 
-    const { data, error } = await uploadOwnFile("vendor-media", file);
+    const { data, error } = await uploadOwnFile("vendor-media", file, "AVATAR");
     if (error || !data) {
       setLogoStatus("error");
       setLogoError(error ?? "Upload failed.");
@@ -204,7 +204,7 @@ export default function VendorSettings() {
     setBannerStatus("uploading");
     setBannerError(null);
 
-    const { data, error } = await uploadOwnFile("vendor-media", file);
+    const { data, error } = await uploadOwnFile("vendor-media", file, "WIDE_PHOTO");
     if (error || !data) {
       setBannerStatus("error");
       setBannerError(error ?? "Upload failed.");

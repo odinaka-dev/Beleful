@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { compressImage, type CompressionPresetName } from "./compress-image";
 
 export type StorageBucket = "avatars" | "vendor-media" | "agent-documents";
 
@@ -11,13 +12,15 @@ interface UploadResult {
 }
 
 /**
- * Uploads a file into the caller's own folder ({user_id}/...) in the given
- * bucket. Storage RLS enforces that the folder matches auth.uid(), so this
- * only works for the signed-in user's own files.
+ * Compresses (see {@link compressImage}) then uploads a file into the
+ * caller's own folder ({user_id}/...) in the given bucket. Storage RLS
+ * enforces that the folder matches auth.uid(), so this only works for the
+ * signed-in user's own files.
  */
 export async function uploadOwnFile(
   bucket: StorageBucket,
   file: File,
+  preset: CompressionPresetName,
 ): Promise<{ data: UploadResult | null; error: string | null }> {
   const supabase = createClient();
 
@@ -26,12 +29,14 @@ export async function uploadOwnFile(
     return { data: null, error: "You must be signed in to upload a file." };
   }
 
-  const ext = file.name.split(".").pop() || "bin";
+  const compressed = await compressImage(file, preset);
+
+  const ext = compressed.name.split(".").pop() || "bin";
   const path = `${userData.user.id}/${crypto.randomUUID()}.${ext}`;
 
   const { error: uploadError } = await supabase.storage
     .from(bucket)
-    .upload(path, file, { upsert: true });
+    .upload(path, compressed, { upsert: true, contentType: compressed.type });
 
   if (uploadError) {
     return { data: null, error: uploadError.message };

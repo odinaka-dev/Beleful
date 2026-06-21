@@ -125,7 +125,7 @@ export default function AgentProfile() {
     setAvatarStatus("uploading");
     setAvatarError(null);
 
-    const { data, error } = await uploadOwnFile("avatars", file);
+    const { data, error } = await uploadOwnFile("avatars", file, "AVATAR");
     if (error || !data) {
       setAvatarStatus("error");
       setAvatarError(error ?? "Upload failed.");
@@ -159,7 +159,7 @@ export default function AgentProfile() {
     setIdStatus("uploading");
     setIdError(null);
 
-    const { data, error } = await uploadOwnFile("agent-documents", file);
+    const { data, error } = await uploadOwnFile("agent-documents", file, "DOCUMENT");
     if (error || !data) {
       setIdStatus("error");
       setIdError(error ?? "Upload failed.");
