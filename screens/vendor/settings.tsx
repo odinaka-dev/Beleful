@@ -3,25 +3,95 @@
 import * as React from "react";
 import { DashboardHeader } from "@/components/dashboard/dashboard-shell";
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { FormField } from "@/components/form/form-field";
 import { SelectField } from "@/components/form/select-field";
 import { FileUpload } from "@/components/form/file-upload";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { cn } from "@/lib/utils";
 import { SCHOOLS } from "@/helpers/auth.helpers";
-import {
-  VENDOR_PROFILE,
-  OPENING_HOURS,
-  type OpeningHour,
-} from "@/helpers/vendor.helpers";
+import { OPENING_HOURS, type OpeningHour } from "@/helpers/vendor.helpers";
 import { createClient } from "@/lib/supabase/client";
 import { uploadOwnFile } from "@/lib/storage/upload";
+import type { Json } from "@/lib/supabase/database.types";
 
 type ImageStatus = "idle" | "uploading" | "saved" | "error";
+type SaveStatus = "idle" | "saving" | "saved" | "error";
+
+interface VendorSettingsProfile {
+  businessName: string;
+  vendorName: string;
+  email: string;
+  phone: string;
+  school: string;
+  address: string;
+  cac: string;
+}
+
+const EMPTY_PROFILE: VendorSettingsProfile = {
+  businessName: "",
+  vendorName: "",
+  email: "",
+  phone: "",
+  school: "",
+  address: "",
+  cac: "",
+};
+
+/** Loading placeholder matching the settings form's three sections. */
+function VendorSettingsSkeleton() {
+  return (
+    <div className="flex flex-col gap-6">
+      <Card>
+        <Skeleton className="mb-4 h-5 w-24" />
+        <div className="grid gap-5 sm:grid-cols-[auto_1fr] sm:items-start">
+          <Skeleton className="h-28 w-28 rounded-2xl" />
+          <Skeleton className="h-36 w-full rounded-2xl" />
+        </div>
+      </Card>
+
+      <Card>
+        <Skeleton className="mb-4 h-5 w-36" />
+        <div className="grid gap-4 sm:grid-cols-2">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="flex flex-col gap-1.5">
+              <Skeleton className="h-3 w-20" />
+              <Skeleton className="h-11 w-full rounded-xl" />
+            </div>
+          ))}
+          <div className="flex flex-col gap-1.5 sm:col-span-2">
+            <Skeleton className="h-3 w-28" />
+            <Skeleton className="h-11 w-full rounded-xl" />
+          </div>
+        </div>
+      </Card>
+
+      <Card>
+        <Skeleton className="mb-4 h-5 w-32" />
+        <div className="flex flex-col gap-2">
+          {Array.from({ length: 7 }).map((_, i) => (
+            <div
+              key={i}
+              className="flex items-center gap-3 rounded-2xl border border-[#00452E]/8 p-3"
+            >
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-7 w-16 rounded-full" />
+              <div className="ml-auto flex items-center gap-2">
+                <Skeleton className="h-9 w-24 rounded-xl" />
+                <Skeleton className="h-9 w-24 rounded-xl" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
+    </div>
+  );
+}
 
 /** Vendor profile settings: logo/banner, business details, opening hours. */
 export default function VendorSettings() {
-  const [profile, setProfile] = React.useState(VENDOR_PROFILE);
+  const [profile, setProfile] = React.useState<VendorSettingsProfile>(EMPTY_PROFILE);
+  const [originalEmail, setOriginalEmail] = React.useState("");
   const [hours, setHours] = React.useState<OpeningHour[]>(OPENING_HOURS);
 
   const [logoUrl, setLogoUrl] = React.useState<string | null>(null);
@@ -31,25 +101,63 @@ export default function VendorSettings() {
   const [logoError, setLogoError] = React.useState<string | null>(null);
   const [bannerError, setBannerError] = React.useState<string | null>(null);
 
-  // Load the vendor's current logo/banner so the upload controls show what's
-  // already saved, not a blank state. Business details/opening hours stay on
-  // mock data for now — that's the next pass (full vendor dashboard wiring).
+  const [saveStatus, setSaveStatus] = React.useState<SaveStatus>("idle");
+  const [saveError, setSaveError] = React.useState<string | null>(null);
+  const [saveNote, setSaveNote] = React.useState<string | null>(null);
+
+  const [loading, setLoading] = React.useState(true);
+
+  // Load the vendor's current data so the form reflects what's actually
+  // saved, not mock placeholders.
   React.useEffect(() => {
     let active = true;
     (async () => {
-      const supabase = createClient();
-      const { data: userData } = await supabase.auth.getUser();
-      if (!userData.user) return;
+      try {
+        const supabase = createClient();
+        const { data: userData } = await supabase.auth.getUser();
+        if (!userData.user) return;
 
-      const { data: vendor } = await supabase
-        .from("vendors")
-        .select("logo, banner_image")
-        .eq("user_id", userData.user.id)
-        .single();
+        const [{ data: vendor }, { data: prof }] = await Promise.all([
+          supabase
+            .from("vendors")
+            .select("logo, banner_image, business_name, address, cac_number, opening_hours")
+            .eq("user_id", userData.user.id)
+            .single(),
+          supabase
+            .from("profiles")
+            .select("full_name, email, phone_number, school")
+            .eq("id", userData.user.id)
+            .single(),
+        ]);
 
-      if (active && vendor) {
-        setLogoUrl(vendor.logo);
-        setBannerUrl(vendor.banner_image);
+        if (!active) return;
+
+        if (vendor) {
+          setLogoUrl(vendor.logo);
+          setBannerUrl(vendor.banner_image);
+          setHours(
+            (vendor.opening_hours as unknown as OpeningHour[] | null) ?? OPENING_HOURS,
+          );
+          setProfile((p) => ({
+            ...p,
+            businessName: vendor.business_name ?? "",
+            address: vendor.address ?? "",
+            cac: vendor.cac_number ?? "",
+          }));
+        }
+
+        if (prof) {
+          setProfile((p) => ({
+            ...p,
+            vendorName: prof.full_name ?? "",
+            email: prof.email ?? "",
+            phone: prof.phone_number ?? "",
+            school: prof.school ?? "",
+          }));
+          setOriginalEmail(prof.email ?? "");
+        }
+      } finally {
+        if (active) setLoading(false);
       }
     })();
     return () => {
@@ -134,9 +242,66 @@ export default function VendorSettings() {
     );
   }
 
-  function save(e: React.FormEvent) {
+  async function save(e: React.FormEvent) {
     e.preventDefault();
-    // Mock save — wire to Supabase later.
+    setSaveStatus("saving");
+    setSaveError(null);
+    setSaveNote(null);
+
+    const supabase = createClient();
+    const { data: userData } = await supabase.auth.getUser();
+    if (!userData.user) {
+      setSaveStatus("error");
+      setSaveError("You must be signed in.");
+      return;
+    }
+
+    const { error: vendorError } = await supabase
+      .from("vendors")
+      .update({
+        business_name: profile.businessName,
+        address: profile.address,
+        cac_number: profile.cac || null,
+        opening_hours: hours as unknown as Json,
+      })
+      .eq("user_id", userData.user.id);
+
+    if (vendorError) {
+      setSaveStatus("error");
+      setSaveError(vendorError.message);
+      return;
+    }
+
+    const { error: profileError } = await supabase
+      .from("profiles")
+      .update({
+        full_name: profile.vendorName,
+        phone_number: profile.phone,
+        school: profile.school,
+      })
+      .eq("id", userData.user.id);
+
+    if (profileError) {
+      setSaveStatus("error");
+      setSaveError(profileError.message);
+      return;
+    }
+
+    if (profile.email && profile.email !== originalEmail) {
+      const { error: emailError } = await supabase.auth.updateUser({
+        email: profile.email,
+      });
+      if (emailError) {
+        setSaveStatus("error");
+        setSaveError(emailError.message);
+        return;
+      }
+      setSaveNote(
+        "Confirmation link sent to your new email — your login email won't change until you confirm it.",
+      );
+    }
+
+    setSaveStatus("saved");
   }
 
   return (
@@ -144,9 +309,37 @@ export default function VendorSettings() {
       <DashboardHeader
         title="Profile settings"
         subtitle="Manage how your store appears to students."
-        action={<PrimaryButton fullWidth={false} type="submit">Save changes</PrimaryButton>}
+        action={
+          <PrimaryButton
+            fullWidth={false}
+            type="submit"
+            loading={saveStatus === "saving"}
+            disabled={loading}
+          >
+            Save changes
+          </PrimaryButton>
+        }
       />
 
+      {saveStatus === "saved" && (
+        <p className="mb-4 rounded-xl bg-[#00452E]/[0.06] px-4 py-3 text-sm font-medium text-[#00452E]">
+          Saved.
+        </p>
+      )}
+      {saveNote && (
+        <p className="mb-4 rounded-xl bg-[#FFFFDE] px-4 py-3 text-sm font-medium text-[#7A5C00]">
+          {saveNote}
+        </p>
+      )}
+      {saveStatus === "error" && (
+        <p className="mb-4 rounded-xl bg-[#FEE2E2] px-4 py-3 text-sm font-medium text-[#DC2626]">
+          {saveError}
+        </p>
+      )}
+
+      {loading ? (
+        <VendorSettingsSkeleton />
+      ) : (
       <div className="flex flex-col gap-6">
         {/* Branding */}
         <Card>
@@ -305,6 +498,7 @@ export default function VendorSettings() {
           </div>
         </Card>
       </div>
+      )}
     </form>
   );
 }

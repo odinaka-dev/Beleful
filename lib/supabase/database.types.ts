@@ -426,6 +426,7 @@ export type Database = {
           description: string | null
           id: string
           logo: string | null
+          opening_hours: Json | null
           rating: number | null
           user_id: string | null
           verified: boolean | null
@@ -439,6 +440,7 @@ export type Database = {
           description?: string | null
           id?: string
           logo?: string | null
+          opening_hours?: Json | null
           rating?: number | null
           user_id?: string | null
           verified?: boolean | null
@@ -452,6 +454,7 @@ export type Database = {
           description?: string | null
           id?: string
           logo?: string | null
+          opening_hours?: Json | null
           rating?: number | null
           user_id?: string | null
           verified?: boolean | null
