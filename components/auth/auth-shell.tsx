@@ -1,0 +1,183 @@
+"use client";
+
+import * as React from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { BelefulImages } from "@/constant/image";
+import { cn } from "@/lib/utils";
+
+export type AuthRole = "student" | "vendor" | "agent";
+
+interface RoleTab {
+  role: AuthRole;
+  label: string;
+  loginHref: string;
+}
+
+const ROLE_TABS: RoleTab[] = [
+  { role: "student", label: "Student", loginHref: "/login" },
+  { role: "vendor", label: "Vendor", loginHref: "/vendor/login" },
+  { role: "agent", label: "Agent", loginHref: "/agent/login" },
+];
+
+interface AuthHighlight {
+  eyebrow: string;
+  heading: string;
+  sub: string;
+  bullets: string[];
+  image: typeof BelefulImages.Burger;
+  accent: string;
+}
+
+// Illustration-panel copy + art per role, reusing existing brand assets.
+const ROLE_HIGHLIGHT: Record<AuthRole, AuthHighlight> = {
+  student: {
+    eyebrow: "For Students",
+    heading: "Campus cravings, delivered in minutes.",
+    sub: "Order from your favourite campus vendors and track every step to your hostel door.",
+    bullets: [
+      "Order from vendors you already know",
+      "Live delivery tracking & PIN handoff",
+      "Student-friendly delivery fees",
+    ],
+    image: BelefulImages.Burger,
+    accent: "#00452E",
+  },
+  vendor: {
+    eyebrow: "For vendors",
+    heading: "Reach more students. Sell more food.",
+    sub: "Put your kitchen in front of the whole campus and get settled fast.",
+    bullets: [
+      "Grow visibility across campus",
+      "Manage menu & orders in one place",
+      "Fast, reliable payouts",
+    ],
+    image: BelefulImages.FoodBottle,
+    accent: "#00452E",
+  },
+  agent: {
+    eyebrow: "For Delivery Agents",
+    heading: "Deliver between classes. Earn on your terms.",
+    sub: "Pick up nearby deliveries, walk or ride across campus, and cash out anytime.",
+    bullets: [
+      "Flexible deliveries around your schedule",
+      "Transparent earnings per trip",
+      "Withdraw your balance anytime",
+    ],
+    image: BelefulImages.PhoneImage,
+    accent: "#00452E",
+  },
+};
+
+interface AuthShellProps {
+  role: AuthRole;
+  /** Form heading, e.g. "Welcome back". */
+  title: string;
+  subtitle: string;
+  children: React.ReactNode;
+  /** CTA shown under the form, e.g. switch between login/signup. */
+  footer?: React.ReactNode;
+  /** Hide the role switcher (used on registration sub-flows if desired). */
+  hideRoleTabs?: boolean;
+}
+
+/**
+ * Two-column auth scaffold: brand illustration panel (desktop) + form panel.
+ * Mobile shows a compact branded header above the form.
+ */
+export function AuthShell({
+  role,
+  title,
+  subtitle,
+  children,
+  footer,
+  hideRoleTabs = false,
+}: AuthShellProps) {
+  const highlight = ROLE_HIGHLIGHT[role];
+
+  return (
+    <div className="flex w-full max-h-screen overflow-hidden bg-white">
+      {/* Illustration panel — desktop only */}
+      <aside className="relative hidden w-[44%] flex-col justify-between overflow-hidden bg-[#00452E] p-10 lg:flex xl:w-[48%] xl:p-14">
+        <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-[#016644]/40 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-24 -left-10 h-72 w-72 rounded-full bg-[#FCD882]/20 blur-3xl" />
+
+        <Link href="/" className="relative z-10 w-fit">
+          <Image
+            src={BelefulImages.logoImage}
+            alt="BELEFUL"
+            className="w-32 mb-2"
+          />
+        </Link>
+
+        <div className="relative z-10">
+          <span className="inline-flex rounded-full bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-[#FCD882]">
+            {highlight.eyebrow}
+          </span>
+          <h2 className="max-w-md mt-5 text-4xl font-bold leading-tight text-white font-heading">
+            {highlight.heading}
+          </h2>
+          <p className="max-w-md mt-4 text-base leading-relaxed text-white/70">
+            {highlight.sub}
+          </p>
+        </div>
+
+        <div className="">
+          <Image
+            src={BelefulImages.Burger}
+            alt=""
+            className="object-contain w-full"
+          />
+        </div>
+      </aside>
+
+      {/* Form panel */}
+      <main className="flex flex-col items-center flex-1 w-full px-5 py-8 overflow-y-auto sm:px-8 lg:py-12">
+        <div className="w-full max-w-md">
+          {/* Mobile brand header */}
+          <Link href="/" className="flex mb-8 w-fit lg:hidden">
+            <Image
+              src={BelefulImages.logoImage}
+              alt="BELEFUL"
+              className="w-28"
+            />
+          </Link>
+
+          {!hideRoleTabs && (
+            <div className="mb-8 grid grid-cols-3 gap-1 rounded-2xl bg-[#00452E]/[0.04] p-1">
+              {ROLE_TABS.map((tab) => (
+                <Link
+                  key={tab.role}
+                  href={tab.loginHref}
+                  className={cn(
+                    "rounded-xl py-2.5 text-center text-sm font-semibold transition-all duration-200",
+                    tab.role === role
+                      ? "bg-[#00452E] text-white shadow-sm"
+                      : "text-[#666666] hover:text-[#00452E]",
+                  )}
+                >
+                  {tab.label}
+                </Link>
+              ))}
+            </div>
+          )}
+
+          <div className="mb-7">
+            <h1 className="font-heading text-2xl font-bold text-[#111111] sm:text-3xl">
+              {title}
+            </h1>
+            <p className="mt-2 text-sm text-[#666666]">{subtitle}</p>
+          </div>
+
+          {children}
+
+          {footer && (
+            <div className="mt-6 text-center text-sm text-[#666666]">
+              {footer}
+            </div>
+          )}
+        </div>
+      </main>
+    </div>
+  );
+}
