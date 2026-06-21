@@ -10,6 +10,7 @@ import {
   ShoppingCart,
   ArrowLeft2,
   ArrowDown2,
+  Profile,
 } from "iconsax-reactjs";
 import { BelefulImages } from "@/constant/image";
 import { useCart } from "@/provider/cart-provider";
@@ -23,6 +24,13 @@ export function StudentTopNav() {
   const pathname = usePathname() ?? "";
   const router = useRouter();
   const [campus, setCampus] = React.useState(CAMPUSES[0]);
+  const [search, setSearch] = React.useState("");
+
+  function submitSearch() {
+    const params = new URLSearchParams();
+    if (search) params.set("q", search);
+    router.push(`/user-dashboard/explore?${params.toString()}`);
+  }
 
   const isDashboard = pathname === "/user-dashboard";
 
@@ -76,6 +84,9 @@ export function StudentTopNav() {
           <SearchNormal1 size={18} color="#666666" />
           <input
             type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && submitSearch()}
             placeholder="Search food, vendors..."
             className="h-11 w-full min-w-0 bg-transparent text-sm text-[#111111] outline-none placeholder:text-[#9CA3AF]"
           />
@@ -93,6 +104,14 @@ export function StudentTopNav() {
               {count}
             </span>
           )}
+        </Link>
+
+        <Link
+          href="/user-dashboard/profile"
+          aria-label="View profile"
+          className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-2xl bg-[#00452E]/5 text-[#00452E] transition-colors hover:bg-[#00452E]/10"
+        >
+          <Profile size={20} variant={pathname.startsWith("/user-dashboard/profile") ? "Bold" : "TwoTone"} />
         </Link>
 
         <SignOutButton

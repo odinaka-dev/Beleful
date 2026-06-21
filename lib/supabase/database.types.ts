@@ -423,11 +423,13 @@ export type Database = {
           business_name: string | null
           cac_number: string | null
           created_at: string | null
+          delivery_fee: number | null
           description: string | null
           id: string
           logo: string | null
           opening_hours: Json | null
           rating: number | null
+          tags: string[] | null
           user_id: string | null
           verified: boolean | null
         }
@@ -437,11 +439,13 @@ export type Database = {
           business_name?: string | null
           cac_number?: string | null
           created_at?: string | null
+          delivery_fee?: number | null
           description?: string | null
           id?: string
           logo?: string | null
           opening_hours?: Json | null
           rating?: number | null
+          tags?: string[] | null
           user_id?: string | null
           verified?: boolean | null
         }
@@ -451,11 +455,13 @@ export type Database = {
           business_name?: string | null
           cac_number?: string | null
           created_at?: string | null
+          delivery_fee?: number | null
           description?: string | null
           id?: string
           logo?: string | null
           opening_hours?: Json | null
           rating?: number | null
+          tags?: string[] | null
           user_id?: string | null
           verified?: boolean | null
         }
@@ -474,6 +480,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_order: {
+        Args: {
+          p_hostel: string
+          p_items: Json
+          p_landmark: string
+          p_vendor_id: string
+        }
+        Returns: {
+          id: string
+          total_amount: number
+        }[]
+      }
       current_agent_id: { Args: never; Returns: string }
       current_vendor_id: { Args: never; Returns: string }
       get_vendor_daily_stats: {
