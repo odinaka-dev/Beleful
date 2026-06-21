@@ -44,7 +44,7 @@ export default function CheckoutPage() {
     // Mock order placement → route to tracking for the seeded active order.
     setTimeout(() => {
       clear();
-      router.push("/student/orders/BF-10293");
+      router.push("/user-dashboard/orders/BF-10293");
     }, 1100);
   }
 

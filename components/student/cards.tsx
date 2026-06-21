@@ -19,7 +19,7 @@ import { useCart } from "@/provider/cart-provider";
 export function CategoryCard({ category }: { category: Category }) {
   return (
     <Link
-      href={`/student/explore?category=${category.id}`}
+      href={`/user-dashboard/explore?category=${category.id}`}
       className="group flex flex-col items-center gap-2"
     >
       <span
@@ -39,7 +39,7 @@ export function CategoryCard({ category }: { category: Category }) {
 export function VendorCard({ vendor }: { vendor: Vendor }) {
   return (
     <Link
-      href={`/student/store/${vendor.id}`}
+      href={`/user-dashboard/store/${vendor.id}`}
       className="group block overflow-hidden rounded-3xl border border-[#00452E]/10 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(0,0,0,0.1)]"
     >
       <div className="relative">
@@ -78,7 +78,7 @@ export function FoodCard({ food }: { food: Food }) {
 
   return (
     <div className="group flex flex-col overflow-hidden rounded-3xl border border-[#00452E]/10 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(0,0,0,0.1)]">
-      <Link href={`/student/store/${food.vendorId}`} className="relative block">
+      <Link href={`/user-dashboard/store/${food.vendorId}`} className="relative block">
         <FoodImage emoji={food.emoji} gradient={food.gradient} className="h-32 w-full" />
         {food.popular && (
           <span className="absolute left-3 top-3">
@@ -123,7 +123,7 @@ export function ActiveOrderCard({ order }: { order: ActiveOrder }) {
 
   return (
     <Link
-      href={`/student/orders/${order.id}`}
+      href={`/user-dashboard/orders/${order.id}`}
       className="block rounded-3xl border border-[#00452E]/10 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
     >
       <div className="flex items-center justify-between">

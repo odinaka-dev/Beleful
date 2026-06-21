@@ -62,7 +62,7 @@ export default function StudentDashboard() {
 
       {/* Categories */}
       <section>
-        <SectionHeader title="Categories" href="/student/explore" />
+        <SectionHeader title="Categories" href="/user-dashboard/explore" />
         <div className="flex gap-4 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:grid sm:grid-cols-6 sm:gap-3 sm:overflow-visible">
           {CATEGORIES.map((category) => (
             <CategoryCard key={category.id} category={category} />
@@ -73,7 +73,7 @@ export default function StudentDashboard() {
       {/* Active orders */}
       {ACTIVE_ORDERS.length > 0 && (
         <section>
-          <SectionHeader title="Active orders" href="/student/orders" />
+          <SectionHeader title="Active orders" href="/user-dashboard/orders" />
           <div className="grid gap-4 sm:grid-cols-2">
             {ACTIVE_ORDERS.map((order) => (
               <ActiveOrderCard key={order.id} order={order} />
@@ -84,7 +84,7 @@ export default function StudentDashboard() {
 
       {/* Popular vendors */}
       <section>
-        <SectionHeader title="Popular vendors" href="/student/explore" />
+        <SectionHeader title="Popular vendors" href="/user-dashboard/explore" />
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           {VENDORS.map((vendor) => (
             <VendorCard key={vendor.id} vendor={vendor} />
@@ -94,7 +94,7 @@ export default function StudentDashboard() {
 
       {/* Recommended meals */}
       <section>
-        <SectionHeader title="Recommended for you" href="/student/explore" />
+        <SectionHeader title="Recommended for you" href="/user-dashboard/explore" />
         {recommended.length > 0 ? (
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             {recommended.map((food) => (

@@ -24,7 +24,7 @@ export default function CartPage() {
           title="Your cart is empty"
           description="Browse vendors and add some meals to get started."
           action={
-            <Link href="/student">
+            <Link href="/user-dashboard">
               <PrimaryButton fullWidth={false}>Explore vendors</PrimaryButton>
             </Link>
           }
@@ -98,7 +98,7 @@ export default function CartPage() {
         {/* Summary */}
         <div className="rounded-3xl border border-[#00452E]/10 bg-white p-5 shadow-sm lg:sticky lg:top-24">
           <OrderSummary />
-          <Link href="/student/checkout" className="mt-6 block">
+          <Link href="/user-dashboard/checkout" className="mt-6 block">
             <PrimaryButton>Proceed to checkout</PrimaryButton>
           </Link>
         </div>

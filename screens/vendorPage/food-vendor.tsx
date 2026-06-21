@@ -4,7 +4,7 @@ import HeaderComponent from "@/components/layout/header";
 import DoubleButton from "@/components/ui/Button";
 import { BelefulImages } from "@/constant/image";
 import Image from "next/image";
-import BelefulOrdersComponents from "@/pages/vendorPage/components/beleful-orders";
+import BelefulOrdersComponents from "@/screens/vendorPage/components/beleful-orders";
 import FrequentlyComponent from "@/components/layout/frequently-asked-questions";
 import SubFooterComponent from "@/components/layout/sub-footer";
 import AvailableVendorComponent from "@/components/layout/available-vendor";

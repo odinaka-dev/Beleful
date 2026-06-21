@@ -23,14 +23,14 @@ export function StudentTopNav() {
   const router = useRouter();
   const [campus, setCampus] = React.useState(CAMPUSES[0]);
 
-  const isDashboard = pathname === "/student";
+  const isDashboard = pathname === "/user-dashboard";
 
   return (
     <header className="sticky top-0 z-40 border-b border-[#00452E]/10 bg-white/90 backdrop-blur-md">
       <div className="mx-auto flex w-full max-w-[1200px] items-center gap-3 px-4 py-3 sm:gap-5 sm:px-6">
         {/* Back button on inner pages (mobile), logo otherwise */}
         {isDashboard ? (
-          <Link href="/student" className="flex-shrink-0">
+          <Link href="/user-dashboard" className="flex-shrink-0">
             <Image src={BelefulImages.logoImage} alt="BELEFUL" className="w-24 sm:w-28" />
           </Link>
         ) : (
@@ -43,7 +43,7 @@ export function StudentTopNav() {
           </button>
         )}
 
-        <Link href="/student" className={isDashboard ? "hidden" : "hidden flex-shrink-0 lg:block"}>
+        <Link href="/user-dashboard" className={isDashboard ? "hidden" : "hidden flex-shrink-0 lg:block"}>
           <Image src={BelefulImages.logoImage} alt="BELEFUL" className="w-28" />
         </Link>
 
@@ -82,7 +82,7 @@ export function StudentTopNav() {
 
         {/* Cart */}
         <Link
-          href="/student/cart"
+          href="/user-dashboard/cart"
           aria-label="View cart"
           className="relative grid h-11 w-11 flex-shrink-0 place-items-center rounded-2xl bg-[#00452E] text-white transition-transform hover:-translate-y-0.5"
         >

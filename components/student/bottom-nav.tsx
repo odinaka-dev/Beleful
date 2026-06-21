@@ -11,10 +11,10 @@ import {
 import { cn } from "@/lib/utils";
 
 const TABS = [
-  { href: "/student", label: "Home", icon: Home2, match: (p: string) => p === "/student" },
-  { href: "/student/explore", label: "Explore", icon: SearchNormal1, match: (p: string) => p.startsWith("/student/explore") || p.startsWith("/student/store") },
-  { href: "/student/orders", label: "Orders", icon: ReceiptItem, match: (p: string) => p.startsWith("/student/orders") },
-  { href: "/student/profile", label: "Profile", icon: Profile, match: (p: string) => p.startsWith("/student/profile") },
+  { href: "/user-dashboard", label: "Home", icon: Home2, match: (p: string) => p === "/user-dashboard" },
+  { href: "/user-dashboard/explore", label: "Explore", icon: SearchNormal1, match: (p: string) => p.startsWith("/user-dashboard/explore") || p.startsWith("/user-dashboard/store") },
+  { href: "/user-dashboard/orders", label: "Orders", icon: ReceiptItem, match: (p: string) => p.startsWith("/user-dashboard/orders") },
+  { href: "/user-dashboard/profile", label: "Profile", icon: Profile, match: (p: string) => p.startsWith("/user-dashboard/profile") },
 ];
 
 /** Mobile-only bottom tab bar for the student app. */

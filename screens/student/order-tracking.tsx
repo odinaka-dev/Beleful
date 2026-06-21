@@ -114,7 +114,7 @@ export default function OrderTrackingPage({ orderId }: { orderId: string }) {
             </p>
           </section>
 
-          <Link href="/student" className="text-center text-sm font-semibold text-[#00452E] hover:underline">
+          <Link href="/user-dashboard" className="text-center text-sm font-semibold text-[#00452E] hover:underline">
             Back to home
           </Link>
         </div>

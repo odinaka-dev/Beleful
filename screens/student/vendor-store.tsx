@@ -111,7 +111,7 @@ export default function VendorStorePage({ vendorId }: { vendorId: string }) {
       {count > 0 && (
         <div className="fixed inset-x-0 bottom-[72px] z-40 px-4 lg:bottom-6">
           <Link
-            href="/student/cart"
+            href="/user-dashboard/cart"
             className="mx-auto flex max-w-[1200px] items-center justify-between rounded-2xl bg-[#00452E] px-5 py-4 text-white shadow-[0_12px_30px_rgba(0,69,46,0.35)] transition-transform hover:-translate-y-0.5"
           >
             <span className="flex items-center gap-3 font-semibold">
