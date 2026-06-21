@@ -2,21 +2,41 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Sms } from "iconsax-reactjs";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { FormField } from "@/components/form/form-field";
 import { PasswordField } from "@/components/form/password-field";
 import { PrimaryButton } from "@/components/ui/primary-button";
+import { signInWithRole } from "@/lib/auth/sign-in";
+import { ROLE_DASHBOARD_PATH } from "@/lib/auth/roles";
 
 /** Vendor login. */
 export default function VendorLoginPage() {
+  const router = useRouter();
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => setLoading(false), 900);
+    setError(null);
+
+    const { error: signInError } = await signInWithRole(
+      form.email,
+      form.password,
+      "VENDOR",
+    );
+
+    if (signInError) {
+      setError(signInError);
+      setLoading(false);
+      return;
+    }
+
+    router.push(ROLE_DASHBOARD_PATH.VENDOR);
+    router.refresh();
   }
 
   return (
@@ -37,6 +57,12 @@ export default function VendorLoginPage() {
       }
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        {error && (
+          <p className="rounded-xl bg-[#FEE2E2] px-4 py-3 text-sm font-medium text-[#DC2626]">
+            {error}
+          </p>
+        )}
+
         <FormField
           label="Business email"
           type="email"

@@ -12,6 +12,9 @@ interface FileUploadProps {
   optional?: boolean;
   accept?: string;
   onFileChange?: (file: File | null) => void;
+  /** Pre-existing image to show before the user picks a new file (e.g. a
+   * previously uploaded logo). Ignored once the user selects a file. */
+  initialPreviewUrl?: string | null;
 }
 
 /**
@@ -25,13 +28,24 @@ export function FileUpload({
   optional,
   accept = "image/*",
   onFileChange,
+  initialPreviewUrl,
 }: FileUploadProps) {
   const inputRef = React.useRef<HTMLInputElement>(null);
-  const [preview, setPreview] = React.useState<string | null>(null);
+  const [preview, setPreview] = React.useState<string | null>(
+    initialPreviewUrl ?? null,
+  );
   const [fileName, setFileName] = React.useState<string | null>(null);
+  const userPickedRef = React.useRef(false);
+
+  React.useEffect(() => {
+    if (!userPickedRef.current) {
+      setPreview(initialPreviewUrl ?? null);
+    }
+  }, [initialPreviewUrl]);
 
   function handleFiles(files: FileList | null) {
     const file = files?.[0] ?? null;
+    userPickedRef.current = true;
     onFileChange?.(file);
     setFileName(file?.name ?? null);
     if (file && file.type.startsWith("image/")) {

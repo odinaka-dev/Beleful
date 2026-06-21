@@ -18,6 +18,7 @@ export function AgentShell({ children }: { children: React.ReactNode }) {
     <DashboardShell
       navItems={NAV}
       brandHref="/agent-dashboard"
+      logoutHref="/agent/login"
       user={{ name: AGENT_PROFILE.name, role: "Delivery Agent" }}
     >
       {children}

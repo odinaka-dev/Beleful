@@ -13,6 +13,7 @@ import {
 } from "iconsax-reactjs";
 import { BelefulImages } from "@/constant/image";
 import { useCart } from "@/provider/cart-provider";
+import { SignOutButton } from "@/components/auth/sign-out-button";
 
 const CAMPUSES = ["University of Lagos", "University of Ibadan", "Covenant University"];
 
@@ -93,6 +94,11 @@ export function StudentTopNav() {
             </span>
           )}
         </Link>
+
+        <SignOutButton
+          redirectTo="/login"
+          className="h-11 w-11 flex-shrink-0 bg-[#00452E]/5"
+        />
       </div>
     </header>
   );
