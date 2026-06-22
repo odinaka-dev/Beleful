@@ -552,10 +552,15 @@ export default function AgentDashboard() {
     };
   }, [load]);
 
-  React.useEffect(() => {
+  // Reset the PIN entry whenever the active delivery changes. Done during
+  // render (the React "adjust state when a prop changes" pattern) rather than
+  // in an effect, so it doesn't trigger a cascading second render.
+  const [prevActiveId, setPrevActiveId] = React.useState(active?.id);
+  if (active?.id !== prevActiveId) {
+    setPrevActiveId(active?.id);
     setPinInput("");
     setPinError(null);
-  }, [active?.id]);
+  }
 
   React.useEffect(() => {
     if (!agentId || verification !== "verified") return;
