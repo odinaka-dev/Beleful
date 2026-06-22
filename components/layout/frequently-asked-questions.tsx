@@ -1,12 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { Add, Minus } from "iconsax-reactjs";
 import Heading from "../ui/Heading";
 import { Box, Text } from "@chakra-ui/react";
 import { FAQDATA } from "@/helpers/website.helpers";
 
 function FrequentlyComponent() {
   const [activeFaq, setActiveFaq] = useState(0);
+  // Mobile/tablet accordion: -1 means every panel is collapsed.
+  const [openFaq, setOpenFaq] = useState<number>(-1);
 
   return (
     <section className="mx-auto my-20 max-w-[90%] xl:max-w-[1200px] lg:my-36">
@@ -17,8 +20,57 @@ function FrequentlyComponent() {
         description="Ask your preferred questions."
       />
 
-      {/* FAQ Container */}
-      <Box className="grid gap-6 mt-16  lg:grid-cols-2">
+      {/* Accordion — mobile & tablet only (below lg) */}
+      <div className="mt-12 flex flex-col gap-4 lg:hidden">
+        {FAQDATA.map((item, index) => {
+          const isOpen = openFaq === index;
+
+          return (
+            <div
+              key={index}
+              className={`overflow-hidden rounded-3xl border transition-colors duration-300 ${
+                isOpen
+                  ? "border-[#1E1E1E] bg-[#1E1E1E] text-white"
+                  : "border-gray-200 bg-white text-[#111111]"
+              }`}
+            >
+              <button
+                type="button"
+                onClick={() => setOpenFaq(isOpen ? -1 : index)}
+                aria-expanded={isOpen}
+                className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left sm:px-6"
+              >
+                <h2 className="text-base font-medium sm:text-lg">
+                  {item.question}
+                </h2>
+                <span
+                  className={`flex size-8 shrink-0 items-center justify-center rounded-full transition-colors duration-300 ${
+                    isOpen ? "bg-white text-[#1E1E1E]" : "bg-[#F2F2F2] text-[#1E1E1E]"
+                  }`}
+                >
+                  {isOpen ? <Minus size={18} /> : <Add size={18} />}
+                </span>
+              </button>
+
+              {/* Dropdown answer — grid-rows trick gives a smooth height transition */}
+              <div
+                className={`grid transition-all duration-300 ease-in-out ${
+                  isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                }`}
+              >
+                <div className="overflow-hidden">
+                  <p className="px-5 pb-5 text-sm leading-relaxed text-white/85 sm:px-6 sm:text-base">
+                    {item.answer}
+                  </p>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* FAQ Container — desktop (lg and up) keeps the original two-column layout */}
+      <Box className="mt-16 hidden gap-6 lg:grid lg:grid-cols-2">
         {/* Left Questions */}
         <Box className="flex flex-col gap-5">
           {FAQDATA.map((item, index) => {

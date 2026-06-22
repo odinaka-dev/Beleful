@@ -33,8 +33,8 @@ export default function FoodVendorPage() {
             padding={8}
             bgColor="#016644"
             textColor="#ffffff"
-            linkOne=""
-            linkTwo=""
+            linkOne="/vendor/register"
+            linkTwo="/vendor/login"
           />
         </div>
         <div className="w-full">

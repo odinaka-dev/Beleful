@@ -75,8 +75,14 @@ export default function WhatWeAreComponent() {
                     padding={8}
                     bgColor="#ffffff"
                     textColor="#016644"
-                    linkOne=""
-                    linkTwo=""
+                    linkOne={
+                      items.title === "E-Food Marketplace"
+                        ? "/register"
+                        : items.title === "Food Vendors"
+                          ? "/vendor/register"
+                          : "/agent/register"
+                    }
+                    linkTwo="/"
                   />
                 </Box>
 
