@@ -96,7 +96,7 @@ export function AuthShell({
   const highlight = ROLE_HIGHLIGHT[role];
 
   return (
-    <div className="flex w-full max-h-screen overflow-hidden bg-white">
+    <div className="flex w-full h-screen overflow-hidden bg-white">
       {/* Illustration panel — desktop only */}
       <aside className="relative hidden w-[44%] flex-col justify-between overflow-hidden bg-[#00452E] p-10 lg:flex xl:w-[48%] xl:p-14">
         <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-[#016644]/40 blur-3xl" />

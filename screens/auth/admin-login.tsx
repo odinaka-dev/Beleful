@@ -44,8 +44,8 @@ export default function AdminLoginPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#0B1F16] px-5 py-12">
-      <div className="w-full max-w-sm rounded-3xl bg-white p-8 shadow-xl">
-        <div className="mb-7 flex flex-col items-center text-center">
+      <div className="w-full max-w-sm p-8 bg-white shadow-xl rounded-3xl">
+        <div className="flex flex-col items-center text-center mb-7">
           <Image
             src={BelefulImages.logoImage}
             alt="BELEFUL"
