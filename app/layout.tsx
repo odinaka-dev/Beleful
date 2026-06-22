@@ -7,7 +7,7 @@ import "./globals.css";
 import Script from "next/script";
 import { cn } from "@/lib/utils";
 
-const figtree = Figtree({subsets:['latin'],variable:'--font-sans'});
+const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
   title: "Beleful",
@@ -28,10 +28,17 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("h-full", "antialiased", quicksand.variable, quicksand.className, "font-sans", figtree.variable)}
+      className={cn(
+        "h-full",
+        "antialiased",
+        quicksand.variable,
+        quicksand.className,
+        "font-sans",
+        figtree.variable,
+      )}
       suppressHydrationWarning
     >
-      <body className="flex flex-col min-h-full">
+      <body className="">
         <Script
           src="https://example.com/script.js"
           strategy="beforeInteractive"

@@ -28,12 +28,12 @@ export default function Homepage() {
           <DoubleButton
             className="mt-20 flex flex-col sm:flex-row w-full items-center justify-center gap-4 text-[18px] md:text-[24px] font-semibold max-w-[80%] xl:max-w-[1200px] mx-auto"
             buttonName="Quick Order"
-            buttonNameSec="Download our App"
+            buttonNameSec="Get Started"
             padding={8}
             bgColor="#016644"
             textColor="#ffffff"
-            linkOne=""
-            linkTwo=""
+            linkOne="/login"
+            linkTwo="/register"
           />
         </div>
         <div className="w-full">
