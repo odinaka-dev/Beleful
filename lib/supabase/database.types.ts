@@ -7,6 +7,8 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
@@ -238,6 +240,7 @@ export type Database = {
           delivery_agent_id: string | null
           delivery_fee: number | null
           delivery_pin: string | null
+          delivery_stage: string | null
           hostel: string | null
           id: string
           landmark: string | null
@@ -251,6 +254,7 @@ export type Database = {
           delivery_agent_id?: string | null
           delivery_fee?: number | null
           delivery_pin?: string | null
+          delivery_stage?: string | null
           hostel?: string | null
           id?: string
           landmark?: string | null
@@ -264,6 +268,7 @@ export type Database = {
           delivery_agent_id?: string | null
           delivery_fee?: number | null
           delivery_pin?: string | null
+          delivery_stage?: string | null
           hostel?: string | null
           id?: string
           landmark?: string | null
@@ -480,6 +485,72 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      agent_has_related_order: { Args: { agent_id: string }; Returns: boolean }
+      approve_agent: {
+        Args: { p_agent_id: string; p_approved?: boolean }
+        Returns: {
+          hostel: string | null
+          id: string
+          matric_number: string | null
+          rating: number | null
+          student_id_image: string | null
+          total_deliveries: number | null
+          user_id: string | null
+          verification_status: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "delivery_agents"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      claim_order: {
+        Args: { p_order_id: string }
+        Returns: {
+          created_at: string | null
+          delivery_agent_id: string | null
+          delivery_fee: number | null
+          delivery_pin: string | null
+          delivery_stage: string | null
+          hostel: string | null
+          id: string
+          landmark: string | null
+          status: string | null
+          total_amount: number | null
+          user_id: string | null
+          vendor_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      complete_delivery: {
+        Args: { p_order_id: string }
+        Returns: {
+          created_at: string | null
+          delivery_agent_id: string | null
+          delivery_fee: number | null
+          delivery_pin: string | null
+          delivery_stage: string | null
+          hostel: string | null
+          id: string
+          landmark: string | null
+          status: string | null
+          total_amount: number | null
+          user_id: string | null
+          vendor_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       create_order: {
         Args: {
           p_hostel: string
@@ -503,6 +574,8 @@ export type Database = {
         }[]
       }
       is_admin: { Args: never; Returns: boolean }
+      is_verified_agent: { Args: never; Returns: boolean }
+      vendor_has_customer: { Args: { customer_id: string }; Returns: boolean }
     }
     Enums: {
       user_role: "ADMIN" | "USER" | "VENDOR" | "DELIVERY_AGENT"

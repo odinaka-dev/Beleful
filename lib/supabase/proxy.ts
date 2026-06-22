@@ -6,6 +6,7 @@ const PROTECTED_ROUTES: { prefix: string; loginPath: string }[] = [
   { prefix: "/user-dashboard", loginPath: "/login" },
   { prefix: "/agent-dashboard", loginPath: "/agent/login" },
   { prefix: "/vendor-dashboard", loginPath: "/vendor/login" },
+  { prefix: "/admin-dashboard", loginPath: "/admin/login" },
 ];
 
 /**

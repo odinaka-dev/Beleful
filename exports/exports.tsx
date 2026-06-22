@@ -11,6 +11,7 @@ export { default as VendorLoginPage } from "@/screens/auth/vendor-login";
 export { default as VendorRegisterPage } from "@/screens/auth/vendor-register";
 export { default as AgentLoginPage } from "@/screens/auth/agent-login";
 export { default as AgentRegisterPage } from "@/screens/auth/agent-register";
+export { default as AdminLoginPage } from "@/screens/auth/admin-login";
 
 // student app imports goes here
 // NOTE: these live in screens/ (not pages/) — pages/ is the Pages Router, so
@@ -35,3 +36,6 @@ export { default as VendorDashboard } from "@/screens/vendor/dashboard";
 export { default as VendorMenu } from "@/screens/vendor/menu";
 export { default as VendorWallet } from "@/screens/vendor/wallet";
 export { default as VendorSettings } from "@/screens/vendor/settings";
+
+// admin dashboard imports goes here
+export { default as AdminDashboard } from "@/screens/admin/dashboard";
