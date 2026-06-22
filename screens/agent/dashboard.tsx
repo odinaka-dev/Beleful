@@ -10,6 +10,8 @@ import {
   Location,
   Box1,
   Call,
+  Copy,
+  CopySuccess,
   ShieldTick,
 } from "iconsax-reactjs";
 import { DashboardHeader } from "@/components/dashboard/dashboard-shell";
@@ -288,6 +290,17 @@ function ActiveDeliveryCard({
   );
   const done = delivery.stage === "delivered";
   const awaitingPin = delivery.stage === "in_transit";
+  const [copied, setCopied] = React.useState(false);
+
+  async function copyPhone(phone: string) {
+    try {
+      await navigator.clipboard.writeText(phone);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // Clipboard API unavailable (e.g. insecure context) -- no-op.
+    }
+  }
 
   return (
     <div className="overflow-hidden rounded-3xl border border-[#00452E]/10 bg-white shadow-sm">
@@ -349,9 +362,27 @@ function ActiveDeliveryCard({
             <p className="text-sm font-semibold text-[#111111]">
               {delivery.customer}
             </p>
-          </div>
-          <div className="flex items-center gap-3">
             {delivery.customerPhone && (
+              <p className="mt-0.5 text-xs text-[#666666]">
+                {delivery.customerPhone}
+              </p>
+            )}
+          </div>
+          {delivery.customerPhone && (
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => copyPhone(delivery.customerPhone!)}
+                aria-label="Copy phone number"
+                title={copied ? "Copied!" : "Copy phone number"}
+                className="grid h-10 w-10 place-items-center rounded-xl border border-[#00452E]/15 text-[#00452E] transition-colors hover:bg-[#00452E]/5"
+              >
+                {copied ? (
+                  <CopySuccess size={18} variant="Bold" />
+                ) : (
+                  <Copy size={18} variant="TwoTone" />
+                )}
+              </button>
               <a
                 href={`tel:${delivery.customerPhone}`}
                 aria-label="Call customer"
@@ -359,8 +390,8 @@ function ActiveDeliveryCard({
               >
                 <Call size={18} variant="Bold" />
               </a>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         {awaitingPin ? (
