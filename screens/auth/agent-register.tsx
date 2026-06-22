@@ -7,7 +7,6 @@ import { AuthShell } from "@/components/auth/auth-shell";
 import { FormField } from "@/components/form/form-field";
 import { PasswordField } from "@/components/form/password-field";
 import { SelectField } from "@/components/form/select-field";
-import { FileUpload } from "@/components/form/file-upload";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { CheckEmailNotice } from "@/components/auth/check-email-notice";
@@ -114,9 +113,9 @@ export default function AgentRegisterPage() {
                 </StatusBadge>
               </div>
               <p className="text-xs leading-relaxed text-[#666666]">
-                Upload a valid Student ID and a clear profile photo. Our team
-                reviews new agents within 24 hours before you can accept
-                deliveries.
+                After you confirm your email and sign in, upload a valid
+                Student ID from your dashboard. Our team reviews new agents
+                within 24 hours before you can accept deliveries.
               </p>
             </div>
           </div>
@@ -191,21 +190,8 @@ export default function AgentRegisterPage() {
             onChange={set("password")}
           />
 
-          <div className="grid gap-5 sm:grid-cols-2">
-            <FileUpload
-              label="Student ID card"
-              variant="document"
-              hint="Front of your school ID"
-            />
-            <FileUpload
-              label="Profile photo"
-              variant="document"
-              hint="Clear, recent photo of you"
-            />
-          </div>
-
           <PrimaryButton type="submit" loading={loading}>
-            Submit for verification
+            Create account
           </PrimaryButton>
         </form>
       )}

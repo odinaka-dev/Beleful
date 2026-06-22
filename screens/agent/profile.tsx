@@ -10,20 +10,62 @@ import {
   House,
   Box1,
   Star1,
-  TickCircle,
-  Clock,
 } from "iconsax-reactjs";
 import { DashboardHeader } from "@/components/dashboard/dashboard-shell";
 import { Card } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { FileUpload } from "@/components/form/file-upload";
-import { AGENT_PROFILE } from "@/helpers/agent.helpers";
+import type { AgentProfile, VerificationStatus } from "@/helpers/agent.helpers";
 import { createClient } from "@/lib/supabase/client";
 import { uploadOwnFile } from "@/lib/storage/upload";
 import type { Icon } from "iconsax-reactjs";
 
 type ImageStatus = "idle" | "uploading" | "saved" | "error";
+
+interface RawProfileRow {
+  full_name: string | null;
+  email: string | null;
+  phone_number: string | null;
+  school: string | null;
+  created_at: string | null;
+}
+
+interface RawAgentRow {
+  hostel: string | null;
+  matric_number: string | null;
+  verification_status: string | null;
+  total_deliveries: number | null;
+  rating: number | null;
+}
+
+function normalizeStatus(status: string | null): VerificationStatus {
+  return status === "verified" || status === "submitted" ? status : "pending";
+}
+
+function toAgentProfile(profile: RawProfileRow, agent: RawAgentRow): AgentProfile {
+  const verificationStatus = normalizeStatus(agent.verification_status);
+  return {
+    name: profile.full_name ?? "Agent",
+    email: profile.email ?? "",
+    phone: profile.phone_number ?? "",
+    school: profile.school ?? "",
+    studentId: agent.matric_number ?? "",
+    hostel: agent.hostel ?? "",
+    verified: verificationStatus === "verified",
+    verificationStatus,
+    joined: profile.created_at
+      ? new Date(profile.created_at).toLocaleDateString("en-US", {
+          month: "long",
+          year: "numeric",
+        })
+      : "",
+    stats: {
+      totalDeliveries: agent.total_deliveries ?? 0,
+      rating: Number(agent.rating ?? 0),
+    },
+  };
+}
 
 function InfoRow({
   icon: RowIcon,
@@ -69,11 +111,9 @@ function StatBox({
 
 /** Agent profile: verification status, student info, delivery statistics. */
 export default function AgentProfile() {
-  const p = AGENT_PROFILE;
-  const initials = p.name
-    .split(" ")
-    .map((n) => n[0])
-    .join("");
+  const [profile, setProfile] = React.useState<AgentProfile | null>(null);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
 
   const [editing, setEditing] = React.useState(false);
   const [avatarUrl, setAvatarUrl] = React.useState<string | null>(null);
@@ -90,35 +130,78 @@ export default function AgentProfile() {
     (async () => {
       const supabase = createClient();
       const { data: userData } = await supabase.auth.getUser();
-      if (!userData.user) return;
+      if (!userData.user) {
+        if (active) setLoading(false);
+        return;
+      }
 
-      const [{ data: profile }, { data: agent }] = await Promise.all([
+      const [{ data: rawProfile }, { data: rawAgent }] = await Promise.all([
         supabase
           .from("profiles")
-          .select("avatar_url")
+          .select("avatar_url, full_name, email, phone_number, school, created_at")
           .eq("id", userData.user.id)
           .single(),
         supabase
           .from("delivery_agents")
-          .select("student_id_image")
+          .select(
+            "student_id_image, hostel, matric_number, verification_status, total_deliveries, rating",
+          )
           .eq("user_id", userData.user.id)
           .single(),
       ]);
 
       if (!active) return;
-      if (profile?.avatar_url) setAvatarUrl(profile.avatar_url);
+      if (!rawProfile || !rawAgent) {
+        setError("No agent profile found for this account.");
+        setLoading(false);
+        return;
+      }
 
-      if (agent?.student_id_image) {
+      setProfile(toAgentProfile(rawProfile, rawAgent));
+      if (rawProfile.avatar_url) setAvatarUrl(rawProfile.avatar_url);
+
+      if (rawAgent.student_id_image) {
         const { data: signed } = await supabase.storage
           .from("agent-documents")
-          .createSignedUrl(agent.student_id_image, 60 * 10);
+          .createSignedUrl(rawAgent.student_id_image, 60 * 10);
         if (active && signed) setIdDocSignedUrl(signed.signedUrl);
+      } else if (rawAgent.verification_status !== "verified") {
+        // No ID on file yet and not verified — open the upload panel so a
+        // newly-registered agent sees it immediately, with no extra click.
+        setEditing(true);
       }
+      setLoading(false);
     })();
     return () => {
       active = false;
     };
   }, []);
+
+  if (loading) {
+    return (
+      <div>
+        <DashboardHeader title="Profile" subtitle="Your agent account details." />
+        <div className="h-64 animate-pulse rounded-3xl bg-[#00452E]/5" />
+      </div>
+    );
+  }
+
+  if (error || !profile) {
+    return (
+      <div>
+        <DashboardHeader title="Profile" subtitle="Your agent account details." />
+        <p className="rounded-xl bg-[#FEE2E2] px-4 py-3 text-sm font-medium text-[#DC2626]">
+          {error ?? "Profile unavailable."}
+        </p>
+      </div>
+    );
+  }
+
+  const p = profile;
+  const initials = p.name
+    .split(" ")
+    .map((n) => n[0])
+    .join("");
 
   async function handleAvatarChange(file: File | null) {
     if (!file) return;
@@ -173,9 +256,12 @@ export default function AgentProfile() {
       setIdError("You must be signed in.");
       return;
     }
+    // Uploading flags the agent for review — unless they're already
+    // verified, in which case a re-upload shouldn't reset their status.
+    const nextStatus = p.verificationStatus === "verified" ? "verified" : "submitted";
     const { error: updateError } = await supabase
       .from("delivery_agents")
-      .update({ student_id_image: data.path })
+      .update({ student_id_image: data.path, verification_status: nextStatus })
       .eq("user_id", userData.user.id);
 
     if (updateError) {
@@ -189,6 +275,9 @@ export default function AgentProfile() {
       .createSignedUrl(data.path, 60 * 10);
     setIdDocSignedUrl(signed?.signedUrl ?? null);
     setIdStatus("saved");
+    setProfile((prev) =>
+      prev ? { ...prev, verificationStatus: nextStatus, verified: nextStatus === "verified" } : prev,
+    );
   }
 
   return (
@@ -215,15 +304,19 @@ export default function AgentProfile() {
           <p className="text-sm text-[#666666]">Delivery Agent · {p.school}</p>
 
           <div className="mt-4">
-            <StatusBadge tone={p.verified ? "success" : "pending"} dot>
-              {p.verified ? (
-                <>
-                  <ShieldTick size={14} variant="Bold" /> Verified agent
-                </>
-              ) : (
-                "Verification pending"
-              )}
-            </StatusBadge>
+            {p.verificationStatus === "verified" ? (
+              <StatusBadge tone="success" dot>
+                <ShieldTick size={14} variant="Bold" /> Verified agent
+              </StatusBadge>
+            ) : p.verificationStatus === "submitted" ? (
+              <StatusBadge tone="info" dot>
+                Submitted — under review
+              </StatusBadge>
+            ) : (
+              <StatusBadge tone="pending" dot>
+                Upload your ID to get verified
+              </StatusBadge>
+            )}
           </div>
 
           <div className="mt-5 flex w-full items-center justify-between rounded-2xl bg-[#00452E]/[0.03] px-4 py-3 text-sm">
@@ -314,7 +407,7 @@ export default function AgentProfile() {
             <h3 className="mb-4 font-heading text-lg font-bold text-[#111111]">
               Delivery statistics
             </h3>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4">
               <StatBox
                 icon={Box1}
                 label="Deliveries"
@@ -324,16 +417,6 @@ export default function AgentProfile() {
                 icon={Star1}
                 label="Rating"
                 value={p.stats.rating.toFixed(1)}
-              />
-              <StatBox
-                icon={TickCircle}
-                label="Acceptance"
-                value={`${p.stats.acceptanceRate}%`}
-              />
-              <StatBox
-                icon={Clock}
-                label="On-time"
-                value={`${p.stats.onTimeRate}%`}
               />
             </div>
           </Card>

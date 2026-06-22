@@ -43,8 +43,10 @@ export async function signInWithRole(
 
   if (profile.role !== expectedRole) {
     await supabase.auth.signOut();
+    const label = ROLE_LABEL[expectedRole];
+    const article = /^[aeiou]/i.test(label) ? "an" : "a";
     return {
-      error: `This account isn't registered as a ${ROLE_LABEL[expectedRole]}.`,
+      error: `This account isn't registered as ${article} ${label}.`,
     };
   }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Element3, Wallet3, Profile } from "iconsax-reactjs";
+import { ShieldTick } from "iconsax-reactjs";
 import {
   DashboardShell,
   type DashboardNavItem,
@@ -9,13 +9,11 @@ import {
 import { createClient } from "@/lib/supabase/client";
 
 const NAV: DashboardNavItem[] = [
-  { label: "Dashboard", href: "/agent-dashboard", icon: Element3 },
-  { label: "Earnings", href: "/agent-dashboard/earnings", icon: Wallet3 },
-  { label: "Profile", href: "/agent-dashboard/profile", icon: Profile },
+  { label: "Agent approvals", href: "/admin-dashboard", icon: ShieldTick },
 ];
 
-export function AgentShell({ children }: { children: React.ReactNode }) {
-  const [name, setName] = React.useState("Agent");
+export function AdminShell({ children }: { children: React.ReactNode }) {
+  const [name, setName] = React.useState("Admin");
 
   React.useEffect(() => {
     let active = true;
@@ -40,9 +38,9 @@ export function AgentShell({ children }: { children: React.ReactNode }) {
   return (
     <DashboardShell
       navItems={NAV}
-      brandHref="/agent-dashboard"
-      logoutHref="/agent/login"
-      user={{ name, role: "Delivery Agent" }}
+      brandHref="/admin-dashboard"
+      logoutHref="/admin/login"
+      user={{ name, role: "Admin" }}
     >
       {children}
     </DashboardShell>
