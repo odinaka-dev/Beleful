@@ -30,7 +30,6 @@ interface RawOrder {
   id: string;
   status: string | null;
   total_amount: number | null;
-  delivery_pin: string | null;
   vendors: { business_name: string | null } | null;
   order_items: { quantity: number | null }[] | null;
   delivery_agents: {
@@ -38,7 +37,7 @@ interface RawOrder {
   } | null;
 }
 
-function toDetail(row: RawOrder): OrderDetail {
+function toDetail(row: RawOrder, pin: string | null): OrderDetail {
   const itemsCount = (row.order_items ?? []).reduce(
     (sum, item) => sum + (item.quantity ?? 0),
     0,
@@ -49,14 +48,14 @@ function toDetail(row: RawOrder): OrderDetail {
     status: (row.status ?? "pending") as OrderStatus,
     itemsCount,
     total: Number(row.total_amount ?? 0),
-    pin: row.delivery_pin,
+    pin,
     agentName: row.delivery_agents?.profiles?.full_name ?? null,
     agentPhone: row.delivery_agents?.profiles?.phone_number ?? null,
   };
 }
 
 const SELECT =
-  "id, status, total_amount, delivery_pin, vendors(business_name), order_items(quantity), delivery_agents(profiles(full_name, phone_number))";
+  "id, status, total_amount, vendors(business_name), order_items(quantity), delivery_agents(profiles(full_name, phone_number))";
 
 /** Order tracking: status timeline, delivery agent card, delivery PIN. */
 export default function OrderTrackingPage({ orderId }: { orderId: string }) {
@@ -76,7 +75,12 @@ export default function OrderTrackingPage({ orderId }: { orderId: string }) {
       setMissing(true);
       return;
     }
-    setOrder(toDetail(data as unknown as RawOrder));
+
+    const { data: pin } = await supabase.rpc("get_order_pin", {
+      p_order_id: orderId,
+    });
+
+    setOrder(toDetail(data as unknown as RawOrder, pin ?? null));
   }, [orderId]);
 
   React.useEffect(() => {

@@ -10,6 +10,8 @@ import {
   Location,
   Box1,
   Call,
+  Copy,
+  CopySuccess,
   ShieldTick,
 } from "iconsax-reactjs";
 import { DashboardHeader } from "@/components/dashboard/dashboard-shell";
@@ -66,8 +68,8 @@ interface RawActiveRow {
   hostel: string | null;
   landmark: string | null;
   delivery_fee: number | null;
-  delivery_pin: string | null;
   delivery_stage: string | null;
+  pin_locked: boolean | null;
   vendors: { business_name: string | null; address: string | null } | null;
   order_items: { quantity: number | null }[] | null;
   profiles: { full_name: string | null; phone_number: string | null } | null;
@@ -88,13 +90,13 @@ function toActiveDelivery(row: RawActiveRow): ActiveDelivery {
     customerPhone: row.profiles?.phone_number ?? null,
     earnings: Number(row.delivery_fee ?? 0),
     stage: (row.delivery_stage ?? "assigned") as DeliveryStage,
-    pin: row.delivery_pin,
+    pinLocked: !!row.pin_locked,
     itemsCount,
   };
 }
 
 const ACTIVE_SELECT =
-  "id, hostel, landmark, delivery_fee, delivery_pin, delivery_stage, vendors(business_name, address), order_items(quantity), profiles!orders_user_id_fkey(full_name, phone_number)";
+  "id, hostel, landmark, delivery_fee, delivery_stage, pin_locked, vendors(business_name, address), order_items(quantity), profiles!orders_user_id_fkey(full_name, phone_number)";
 
 /** Route between pickup and dropoff, shared by available/active cards. */
 function RouteLine({ pickup, dropoff }: { pickup: string; dropoff: string }) {
@@ -175,6 +177,81 @@ function AvailableCard({
   );
 }
 
+/** 4 masked, individually-focusable boxes that combine into one PIN string. */
+function PinDigitBoxes({
+  value,
+  onChange,
+  hasError,
+  disabled,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  hasError: boolean;
+  disabled: boolean;
+}) {
+  const inputs = React.useRef<(HTMLInputElement | null)[]>([]);
+
+  function setDigitAt(index: number, digit: string) {
+    const digits = Array.from({ length: 4 }, (_, i) => value[i] ?? "");
+    digits[index] = digit;
+    onChange(digits.join(""));
+  }
+
+  function handleChange(index: number, raw: string) {
+    const digit = raw.replace(/\D/g, "").slice(-1);
+    if (!digit) return;
+    setDigitAt(index, digit);
+    if (index < 3) inputs.current[index + 1]?.focus();
+  }
+
+  function handleKeyDown(index: number, e: React.KeyboardEvent) {
+    if (e.key !== "Backspace") return;
+    if (value[index]) {
+      setDigitAt(index, "");
+      return;
+    }
+    if (index > 0) {
+      e.preventDefault();
+      setDigitAt(index - 1, "");
+      inputs.current[index - 1]?.focus();
+    }
+  }
+
+  function handlePaste(e: React.ClipboardEvent) {
+    const digits = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 4);
+    if (!digits) return;
+    e.preventDefault();
+    onChange(digits);
+    inputs.current[Math.min(digits.length, 3)]?.focus();
+  }
+
+  return (
+    <div className="flex justify-center gap-3" onPaste={handlePaste}>
+      {Array.from({ length: 4 }).map((_, i) => (
+        <input
+          key={i}
+          ref={(el) => {
+            inputs.current[i] = el;
+          }}
+          type="password"
+          inputMode="numeric"
+          maxLength={1}
+          disabled={disabled}
+          value={value[i] ?? ""}
+          onChange={(e) => handleChange(i, e.target.value)}
+          onKeyDown={(e) => handleKeyDown(i, e)}
+          className={
+            "h-14 w-12 rounded-2xl border text-center font-heading text-2xl font-bold text-[#00452E] outline-none transition-colors disabled:bg-[#00452E]/[0.03] " +
+            (hasError
+              ? "border-[#DC2626] bg-[#FEE2E2]/40"
+              : "border-[#00452E]/15 bg-white focus:border-[#00452E]")
+          }
+        />
+      ))}
+    </div>
+  );
+}
+
 const NEXT_STAGE: Record<DeliveryStage, DeliveryStage | null> = {
   assigned: "picked_up",
   picked_up: "in_transit",
@@ -193,15 +270,37 @@ function ActiveDeliveryCard({
   delivery,
   advancing,
   onAdvance,
+  pinInput,
+  onPinInputChange,
+  pinError,
+  confirmingPin,
+  onConfirmPin,
 }: {
   delivery: ActiveDelivery;
   advancing: boolean;
   onAdvance: () => void;
+  pinInput: string;
+  onPinInputChange: (value: string) => void;
+  pinError: string | null;
+  confirmingPin: boolean;
+  onConfirmPin: () => void;
 }) {
   const currentIndex = DELIVERY_STAGES.findIndex(
     (s) => s.stage === delivery.stage,
   );
   const done = delivery.stage === "delivered";
+  const awaitingPin = delivery.stage === "in_transit";
+  const [copied, setCopied] = React.useState(false);
+
+  async function copyPhone(phone: string) {
+    try {
+      await navigator.clipboard.writeText(phone);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // Clipboard API unavailable (e.g. insecure context) -- no-op.
+    }
+  }
 
   return (
     <div className="overflow-hidden rounded-3xl border border-[#00452E]/10 bg-white shadow-sm">
@@ -263,17 +362,27 @@ function ActiveDeliveryCard({
             <p className="text-sm font-semibold text-[#111111]">
               {delivery.customer}
             </p>
-          </div>
-          <div className="flex items-center gap-3">
-            {delivery.pin && (
-              <div className="text-right">
-                <p className="text-xs text-[#666666]">Delivery PIN</p>
-                <p className="font-heading font-bold tracking-widest text-[#00452E]">
-                  {delivery.pin}
-                </p>
-              </div>
-            )}
             {delivery.customerPhone && (
+              <p className="mt-0.5 text-xs text-[#666666]">
+                {delivery.customerPhone}
+              </p>
+            )}
+          </div>
+          {delivery.customerPhone && (
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => copyPhone(delivery.customerPhone!)}
+                aria-label="Copy phone number"
+                title={copied ? "Copied!" : "Copy phone number"}
+                className="grid h-10 w-10 place-items-center rounded-xl border border-[#00452E]/15 text-[#00452E] transition-colors hover:bg-[#00452E]/5"
+              >
+                {copied ? (
+                  <CopySuccess size={18} variant="Bold" />
+                ) : (
+                  <Copy size={18} variant="TwoTone" />
+                )}
+              </button>
               <a
                 href={`tel:${delivery.customerPhone}`}
                 aria-label="Call customer"
@@ -281,24 +390,58 @@ function ActiveDeliveryCard({
               >
                 <Call size={18} variant="Bold" />
               </a>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
-        <PrimaryButton
-          className="mt-5"
-          disabled={done}
-          loading={advancing}
-          onClick={onAdvance}
-        >
-          {done ? (
-            <>
-              <TickCircle size={18} variant="Bold" /> {STAGE_ACTION[delivery.stage]}
-            </>
+        {awaitingPin ? (
+          delivery.pinLocked ? (
+            <p className="mt-5 rounded-xl bg-[#FEE2E2] px-4 py-3 text-sm font-medium text-[#DC2626]">
+              Too many incorrect PIN attempts. Ask an admin to unlock this
+              order before trying again.
+            </p>
           ) : (
-            STAGE_ACTION[delivery.stage]
-          )}
-        </PrimaryButton>
+            <div className="mt-5">
+              <p className="mb-3 text-center text-xs font-medium text-[#666666]">
+                Ask the student for their delivery PIN
+              </p>
+              <PinDigitBoxes
+                value={pinInput}
+                onChange={onPinInputChange}
+                hasError={!!pinError}
+                disabled={confirmingPin}
+              />
+              {pinError && (
+                <p className="mt-3 rounded-xl bg-[#FEE2E2] px-4 py-3 text-center text-sm font-semibold text-[#DC2626]">
+                  {pinError}
+                </p>
+              )}
+              <PrimaryButton
+                className="mt-3"
+                disabled={pinInput.length !== 4}
+                loading={confirmingPin}
+                onClick={onConfirmPin}
+              >
+                Confirm PIN &amp; Complete Delivery
+              </PrimaryButton>
+            </div>
+          )
+        ) : (
+          <PrimaryButton
+            className="mt-5"
+            disabled={done}
+            loading={advancing}
+            onClick={onAdvance}
+          >
+            {done ? (
+              <>
+                <TickCircle size={18} variant="Bold" /> {STAGE_ACTION[delivery.stage]}
+              </>
+            ) : (
+              STAGE_ACTION[delivery.stage]
+            )}
+          </PrimaryButton>
+        )}
       </div>
     </div>
   );
@@ -316,6 +459,9 @@ export default function AgentDashboard() {
   const [completedToday, setCompletedToday] = React.useState(0);
   const [earningsToday, setEarningsToday] = React.useState(0);
   const [advancing, setAdvancing] = React.useState(false);
+  const [pinInput, setPinInput] = React.useState("");
+  const [pinError, setPinError] = React.useState<string | null>(null);
+  const [confirmingPin, setConfirmingPin] = React.useState(false);
 
   const load = React.useCallback(async (id: string) => {
     const supabase = createClient();
@@ -407,6 +553,11 @@ export default function AgentDashboard() {
   }, [load]);
 
   React.useEffect(() => {
+    setPinInput("");
+    setPinError(null);
+  }, [active?.id]);
+
+  React.useEffect(() => {
     if (!agentId || verification !== "verified") return;
     const supabase = createClient();
     const channel = supabase
@@ -440,23 +591,46 @@ export default function AgentDashboard() {
   async function advanceActive() {
     if (!active || !agentId) return;
     const next = NEXT_STAGE[active.stage];
-    if (!next) return;
+    if (!next || next === "delivered") return;
 
     setAdvancing(true);
     setError(null);
     const supabase = createClient();
 
-    const { error: advanceError } =
-      next === "delivered"
-        ? await supabase.rpc("complete_delivery", { p_order_id: active.id })
-        : await supabase
-            .from("orders")
-            .update({ delivery_stage: next })
-            .eq("id", active.id);
+    const { error: advanceError } = await supabase
+      .from("orders")
+      .update({ delivery_stage: next })
+      .eq("id", active.id);
 
     if (advanceError) setError(advanceError.message);
     await load(agentId);
     setAdvancing(false);
+  }
+
+  async function confirmDeliveryPin() {
+    if (!active || !agentId) return;
+
+    setConfirmingPin(true);
+    setPinError(null);
+    const supabase = createClient();
+
+    const { data, error: confirmError } = await supabase
+      .rpc("complete_delivery", {
+        p_order_id: active.id,
+        p_pin: pinInput,
+      })
+      .single();
+
+    if (confirmError) {
+      setPinError(confirmError.message);
+    } else if (!data.success) {
+      setPinError(data.message);
+      setPinInput("");
+    } else {
+      setPinInput("");
+    }
+    await load(agentId);
+    setConfirmingPin(false);
   }
 
   if (loading) {
@@ -577,6 +751,14 @@ export default function AgentDashboard() {
               delivery={active}
               advancing={advancing}
               onAdvance={advanceActive}
+              pinInput={pinInput}
+              onPinInputChange={(value) => {
+                setPinInput(value);
+                setPinError(null);
+              }}
+              pinError={pinError}
+              confirmingPin={confirmingPin}
+              onConfirmPin={confirmDeliveryPin}
             />
           ) : (
             <EmptyState
