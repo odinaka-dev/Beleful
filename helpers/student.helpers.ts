@@ -81,7 +81,7 @@ export function buildOrderSteps(status: OrderStatus, hasAgent: boolean): OrderSt
   }
 
   let currentStage: number;
-  if (status === "completed") currentStage = 4;
+  if (status === "completed") currentStage = 5;
   else if (status === "ready") currentStage = hasAgent ? 3 : 2;
   else if (status === "preparing") currentStage = 1;
   else currentStage = 0;

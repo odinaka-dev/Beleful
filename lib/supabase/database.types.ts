@@ -244,6 +244,8 @@ export type Database = {
           hostel: string | null
           id: string
           landmark: string | null
+          pin_attempts: number
+          pin_locked: boolean
           status: string | null
           total_amount: number | null
           user_id: string | null
@@ -258,6 +260,8 @@ export type Database = {
           hostel?: string | null
           id?: string
           landmark?: string | null
+          pin_attempts?: number
+          pin_locked?: boolean
           status?: string | null
           total_amount?: number | null
           user_id?: string | null
@@ -272,6 +276,8 @@ export type Database = {
           hostel?: string | null
           id?: string
           landmark?: string | null
+          pin_attempts?: number
+          pin_locked?: boolean
           status?: string | null
           total_amount?: number | null
           user_id?: string | null
@@ -516,6 +522,8 @@ export type Database = {
           hostel: string | null
           id: string
           landmark: string | null
+          pin_attempts: number
+          pin_locked: boolean
           status: string | null
           total_amount: number | null
           user_id: string | null
@@ -529,27 +537,13 @@ export type Database = {
         }
       }
       complete_delivery: {
-        Args: { p_order_id: string }
+        Args: { p_order_id: string; p_pin: string }
         Returns: {
-          created_at: string | null
-          delivery_agent_id: string | null
-          delivery_fee: number | null
-          delivery_pin: string | null
-          delivery_stage: string | null
-          hostel: string | null
-          id: string
-          landmark: string | null
-          status: string | null
-          total_amount: number | null
-          user_id: string | null
-          vendor_id: string | null
-        }
-        SetofOptions: {
-          from: "*"
-          to: "orders"
-          isOneToOne: true
-          isSetofReturn: false
-        }
+          attempts_remaining: number
+          locked: boolean
+          message: string
+          success: boolean
+        }[]
       }
       create_order: {
         Args: {
@@ -565,6 +559,7 @@ export type Database = {
       }
       current_agent_id: { Args: never; Returns: string }
       current_vendor_id: { Args: never; Returns: string }
+      get_order_pin: { Args: { p_order_id: string }; Returns: string }
       get_vendor_daily_stats: {
         Args: { days_back?: number }
         Returns: {
@@ -575,6 +570,31 @@ export type Database = {
       }
       is_admin: { Args: never; Returns: boolean }
       is_verified_agent: { Args: never; Returns: boolean }
+      unlock_order_pin: {
+        Args: { p_order_id: string }
+        Returns: {
+          created_at: string | null
+          delivery_agent_id: string | null
+          delivery_fee: number | null
+          delivery_pin: string | null
+          delivery_stage: string | null
+          hostel: string | null
+          id: string
+          landmark: string | null
+          pin_attempts: number
+          pin_locked: boolean
+          status: string | null
+          total_amount: number | null
+          user_id: string | null
+          vendor_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       vendor_has_customer: { Args: { customer_id: string }; Returns: boolean }
     }
     Enums: {

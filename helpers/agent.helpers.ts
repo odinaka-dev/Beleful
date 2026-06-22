@@ -39,7 +39,7 @@ export interface ActiveDelivery {
   customerPhone: string | null;
   earnings: number;
   stage: DeliveryStage;
-  pin: string | null;
+  pinLocked: boolean;
   itemsCount: number;
 }
 

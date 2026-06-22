@@ -92,6 +92,85 @@ function toPendingAgent(row: RawAgentRow): PendingAgent {
 const SELECT =
   "id, hostel, matric_number, verification_status, student_id_image, profiles(full_name, email, phone_number, school)";
 
+interface LockedOrder {
+  id: string;
+  hostel: string | null;
+  landmark: string | null;
+  pinAttempts: number;
+  agentName: string | null;
+  agentPhone: string | null;
+}
+
+interface RawLockedOrderRow {
+  id: string;
+  hostel: string | null;
+  landmark: string | null;
+  pin_attempts: number | null;
+  delivery_agents: {
+    profiles: { full_name: string | null; phone_number: string | null } | null;
+  } | null;
+}
+
+function toLockedOrder(row: RawLockedOrderRow): LockedOrder {
+  return {
+    id: row.id,
+    hostel: row.hostel,
+    landmark: row.landmark,
+    pinAttempts: row.pin_attempts ?? 0,
+    agentName: row.delivery_agents?.profiles?.full_name ?? null,
+    agentPhone: row.delivery_agents?.profiles?.phone_number ?? null,
+  };
+}
+
+const LOCKED_SELECT =
+  "id, hostel, landmark, pin_attempts, delivery_agents(profiles(full_name, phone_number))";
+
+function LockedOrderRow({
+  order,
+  onUnlock,
+}: {
+  order: LockedOrder;
+  onUnlock: (id: string) => void;
+}) {
+  const [unlocking, setUnlocking] = React.useState(false);
+
+  async function unlock() {
+    setUnlocking(true);
+    await onUnlock(order.id);
+    setUnlocking(false);
+  }
+
+  return (
+    <Card className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="min-w-0 flex-1">
+        <div className="mb-2 flex items-center gap-2">
+          <p className="font-heading text-sm font-bold text-[#111111]">
+            Order #{order.id.slice(0, 6).toUpperCase()}
+          </p>
+          <StatusBadge tone="danger" dot>
+            Locked · {order.pinAttempts} attempt(s)
+          </StatusBadge>
+        </div>
+        <div className="grid grid-cols-1 gap-1.5 text-xs text-[#666666] sm:grid-cols-2">
+          <span className="flex items-center gap-1.5">
+            <House size={14} variant="TwoTone" />{" "}
+            {[order.hostel, order.landmark].filter(Boolean).join(" — ") || "—"}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <Call size={14} variant="TwoTone" />{" "}
+            {order.agentName ?? "Unknown agent"} ·{" "}
+            {order.agentPhone ?? "—"}
+          </span>
+        </div>
+      </div>
+
+      <PrimaryButton fullWidth={false} loading={unlocking} onClick={unlock}>
+        Unlock order
+      </PrimaryButton>
+    </Card>
+  );
+}
+
 function AgentRow({
   agent,
   onDecide,
@@ -205,6 +284,7 @@ export default function AdminDashboard() {
   const [agents, setAgents] = React.useState<PendingAgent[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+  const [lockedOrders, setLockedOrders] = React.useState<LockedOrder[]>([]);
 
   const load = React.useCallback(async () => {
     const supabase = createClient();
@@ -222,16 +302,32 @@ export default function AdminDashboard() {
     setAgents(((data ?? []) as unknown as RawAgentRow[]).map(toPendingAgent));
   }, [tab]);
 
+  const loadLockedOrders = React.useCallback(async () => {
+    const supabase = createClient();
+    const { data, error: loadError } = await supabase
+      .from("orders")
+      .select(LOCKED_SELECT)
+      .eq("pin_locked", true);
+
+    if (loadError) {
+      setError(loadError.message);
+      return;
+    }
+    setLockedOrders(
+      ((data ?? []) as unknown as RawLockedOrderRow[]).map(toLockedOrder),
+    );
+  }, []);
+
   React.useEffect(() => {
     let active = true;
     (async () => {
-      await load();
+      await Promise.all([load(), loadLockedOrders()]);
       if (active) setLoading(false);
     })();
     return () => {
       active = false;
     };
-  }, [load]);
+  }, [load, loadLockedOrders]);
 
   React.useEffect(() => {
     const supabase = createClient();
@@ -248,6 +344,21 @@ export default function AdminDashboard() {
     };
   }, [load]);
 
+  React.useEffect(() => {
+    const supabase = createClient();
+    const channel = supabase
+      .channel("admin-locked-orders")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "orders" },
+        () => loadLockedOrders(),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [loadLockedOrders]);
+
   async function handleDecide(agentId: string, approved: boolean) {
     setError(null);
     const supabase = createClient();
@@ -257,6 +368,16 @@ export default function AdminDashboard() {
     });
     if (rpcError) setError(rpcError.message);
     await load();
+  }
+
+  async function handleUnlock(orderId: string) {
+    setError(null);
+    const supabase = createClient();
+    const { error: rpcError } = await supabase.rpc("unlock_order_pin", {
+      p_order_id: orderId,
+    });
+    if (rpcError) setError(rpcError.message);
+    await loadLockedOrders();
   }
 
   return (
@@ -303,6 +424,23 @@ export default function AdminDashboard() {
           title="Nothing here"
           description="No agents match this filter right now."
         />
+      )}
+
+      {lockedOrders.length > 0 && (
+        <div className="mt-10">
+          <h2 className="mb-4 font-heading text-lg font-bold text-[#111111]">
+            Locked deliveries
+          </h2>
+          <div className="flex flex-col gap-4">
+            {lockedOrders.map((order) => (
+              <LockedOrderRow
+                key={order.id}
+                order={order}
+                onUnlock={handleUnlock}
+              />
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );
