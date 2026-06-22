@@ -3,15 +3,7 @@
 import Heading from "@/components/ui/Heading";
 import { BelefulImages } from "@/constant/image";
 import Image from "next/image";
-import Link from "next/link";
-import {
-  EmptyWallet,
-  Clock,
-  Routing,
-  MedalStar,
-  Convertshape2,
-  TickCircle,
-} from "iconsax-reactjs";
+import { EmptyWallet, Clock, Routing, MedalStar } from "iconsax-reactjs";
 import FrequentlyComponent from "@/components/layout/frequently-asked-questions";
 
 const BENEFITS = [
