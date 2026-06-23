@@ -29,6 +29,7 @@ import {
 } from "@/helpers/agent.helpers";
 import { createClient } from "@/lib/supabase/client";
 import { useOrderRealtime } from "@/hooks/use-order-realtime";
+import { toaster } from "@/components/ui/toaster";
 
 /** No per-vendor emoji data exists in the schema yet — one neutral fallback. */
 const VENDOR_EMOJI = "🍱";
@@ -584,7 +585,12 @@ export default function AgentDashboard() {
     const { error: claimError } = await supabase.rpc("claim_order", {
       p_order_id: id,
     });
-    if (claimError) setError(claimError.message);
+    if (claimError) {
+      setError(claimError.message);
+      toaster.create({ title: "Couldn't accept delivery", description: claimError.message, type: "error", duration: 4000, closable: true });
+    } else {
+      toaster.create({ title: "Delivery accepted", description: "It's now in your active deliveries.", type: "success", duration: 3000, closable: true });
+    }
     await load(agentId);
   }
 
@@ -606,7 +612,12 @@ export default function AgentDashboard() {
       .update({ delivery_stage: next })
       .eq("id", active.id);
 
-    if (advanceError) setError(advanceError.message);
+    if (advanceError) {
+      setError(advanceError.message);
+      toaster.create({ title: "Couldn't update delivery", description: advanceError.message, type: "error", duration: 4000, closable: true });
+    } else {
+      toaster.create({ title: "Delivery updated", description: `Stage moved to ${next.replace(/_/g, " ")}.`, type: "success", duration: 2500, closable: true });
+    }
     await load(agentId);
     setAdvancing(false);
   }
@@ -627,11 +638,14 @@ export default function AgentDashboard() {
 
     if (confirmError) {
       setPinError(confirmError.message);
+      toaster.create({ title: "Couldn't confirm delivery", description: confirmError.message, type: "error", duration: 4000, closable: true });
     } else if (!data.success) {
       setPinError(data.message);
       setPinInput("");
+      toaster.create({ title: "Incorrect PIN", description: data.message, type: "error", duration: 4000, closable: true });
     } else {
       setPinInput("");
+      toaster.create({ title: "Delivery completed! 🎉", description: "Nice work — your earnings have been updated.", type: "success", duration: 3500, closable: true });
     }
     await load(agentId);
     setConfirmingPin(false);

@@ -18,6 +18,7 @@ import {
   toFood,
 } from "@/helpers/student.helpers";
 import { createClient } from "@/lib/supabase/client";
+import { toaster } from "@/components/ui/toaster";
 
 /** Browse + search every vendor and menu item, filterable by category. */
 export default function ExplorePage() {
@@ -43,6 +44,18 @@ export default function ExplorePage() {
       ]);
 
       if (!active) return;
+
+      const loadError = catRes.error ?? vendorRes.error ?? foodRes.error;
+      if (loadError) {
+        toaster.create({
+          title: "Couldn't load the menu",
+          description: "Something went wrong fetching vendors and dishes. Pull to refresh or try again.",
+          type: "error",
+          duration: 4000,
+          closable: true,
+        });
+      }
+
       setCategories(catRes.data ?? []);
       setVendors(((vendorRes.data ?? []) as unknown as RawVendorRow[]).map(toVendor));
       setFoods(((foodRes.data ?? []) as unknown as RawFoodRow[]).map(toFood));

@@ -9,6 +9,7 @@ import { FileUpload } from "@/components/form/file-upload";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { createClient } from "@/lib/supabase/client";
 import { uploadOwnFile } from "@/lib/storage/upload";
+import { toaster } from "@/components/ui/toaster";
 import { useSchools } from "@/hooks/use-schools";
 
 type ImageStatus = "idle" | "uploading" | "saved" | "error";
@@ -169,6 +170,7 @@ export default function ProfilePage() {
     if (profileError) {
       setSaveStatus("error");
       setSaveError(profileError.message);
+      toaster.create({ title: "Couldn't save profile", description: profileError.message, type: "error", duration: 4000, closable: true });
       return;
     }
 
@@ -189,6 +191,7 @@ export default function ProfilePage() {
       if (emailError) {
         setSaveStatus("error");
         setSaveError(emailError.message);
+        toaster.create({ title: "Couldn't update email", description: emailError.message, type: "error", duration: 4000, closable: true });
         return;
       }
       setSaveNote(
@@ -197,6 +200,7 @@ export default function ProfilePage() {
     }
 
     setSaveStatus("saved");
+    toaster.create({ title: "Profile saved", description: "Your changes have been updated.", type: "success", duration: 3000, closable: true });
   }
 
   return (

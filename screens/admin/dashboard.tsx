@@ -19,6 +19,7 @@ import { PrimaryButton } from "@/components/ui/primary-button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { TableSkeleton } from "@/components/ui/skeletons";
 import { createClient } from "@/lib/supabase/client";
+import { toaster } from "@/components/ui/toaster";
 
 type VerificationStatus = "pending" | "submitted" | "verified" | "rejected";
 
@@ -366,7 +367,12 @@ export default function AdminDashboard() {
       p_agent_id: agentId,
       p_approved: approved,
     });
-    if (rpcError) setError(rpcError.message);
+    if (rpcError) {
+      setError(rpcError.message);
+      toaster.create({ title: "Action failed", description: rpcError.message, type: "error", duration: 4000, closable: true });
+    } else {
+      toaster.create({ title: approved ? "Agent approved" : "Agent rejected", type: "success", duration: 3000, closable: true });
+    }
     await load();
   }
 
@@ -376,7 +382,12 @@ export default function AdminDashboard() {
     const { error: rpcError } = await supabase.rpc("unlock_order_pin", {
       p_order_id: orderId,
     });
-    if (rpcError) setError(rpcError.message);
+    if (rpcError) {
+      setError(rpcError.message);
+      toaster.create({ title: "Couldn't unlock order", description: rpcError.message, type: "error", duration: 4000, closable: true });
+    } else {
+      toaster.create({ title: "Order PIN unlocked", type: "success", duration: 3000, closable: true });
+    }
     await loadLockedOrders();
   }
 

@@ -5,6 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { BelefulImages } from "@/constant/image";
 import { cn } from "@/lib/utils";
+import UserLottieFile from "@/public/lottie/food.json";
+import ShopLottieFile from "@/public/lottie/Food_Beverage.json";
+import DeliveryLottieFile from "@/public/lottie/fooddeliveryboy.json";
+import Lottie from "lottie-react";
 
 export type AuthRole = "student" | "vendor" | "agent";
 
@@ -25,7 +29,7 @@ interface AuthHighlight {
   heading: string;
   sub: string;
   bullets: string[];
-  image: typeof BelefulImages.Burger;
+  image: object; // or Record<string, unknown>
   accent: string;
 }
 
@@ -40,7 +44,7 @@ const ROLE_HIGHLIGHT: Record<AuthRole, AuthHighlight> = {
       "Live delivery tracking & PIN handoff",
       "Student-friendly delivery fees",
     ],
-    image: BelefulImages.Burger,
+    image: UserLottieFile,
     accent: "#00452E",
   },
   vendor: {
@@ -52,7 +56,7 @@ const ROLE_HIGHLIGHT: Record<AuthRole, AuthHighlight> = {
       "Manage menu & orders in one place",
       "Fast, reliable payouts",
     ],
-    image: BelefulImages.FoodBottle,
+    image: ShopLottieFile,
     accent: "#00452E",
   },
   agent: {
@@ -64,7 +68,7 @@ const ROLE_HIGHLIGHT: Record<AuthRole, AuthHighlight> = {
       "Transparent earnings per trip",
       "Withdraw your balance anytime",
     ],
-    image: BelefulImages.PhoneImage,
+    image: DeliveryLottieFile,
     accent: "#00452E",
   },
 };
@@ -123,10 +127,15 @@ export function AuthShell({
         </div>
 
         <div className="">
-          <Image
+          {/* <Image
             src={BelefulImages.Burger}
             alt=""
             className="object-contain w-full"
+          /> */}
+          <Lottie
+            animationData={highlight.image}
+            loop
+            className="w-full max-w-[300px] sm:max-w-[420px] lg:max-w-[720px]"
           />
         </div>
       </aside>

@@ -12,6 +12,7 @@ import { PrimaryButton } from "@/components/ui/primary-button";
 import { CheckEmailNotice } from "@/components/auth/check-email-notice";
 import { signUpWithRole } from "@/lib/auth/sign-up";
 import { useSchools } from "@/hooks/use-schools";
+import { toaster } from "@/components/ui/toaster";
 
 interface StudentForm {
   fullName: string;
@@ -70,8 +71,23 @@ export default function StudentSignupPage() {
 
     if (signUpError) {
       setError(signUpError);
+      toaster.create({
+        title: "Couldn't create your account",
+        description: signUpError,
+        type: "error",
+        duration: 4000,
+        closable: true,
+      });
       return;
     }
+
+    toaster.create({
+      title: "Account created!",
+      description: "Check your inbox to confirm your email and get started.",
+      type: "success",
+      duration: 4000,
+      closable: true,
+    });
 
     setSubmitted(true);
   }

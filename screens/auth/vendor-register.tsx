@@ -12,6 +12,7 @@ import { PrimaryButton } from "@/components/ui/primary-button";
 import { CheckEmailNotice } from "@/components/auth/check-email-notice";
 import { signUpWithRole } from "@/lib/auth/sign-up";
 import { useSchools } from "@/hooks/use-schools";
+import { toaster } from "@/components/ui/toaster";
 
 interface VendorForm {
   businessName: string;
@@ -69,8 +70,23 @@ export default function VendorRegisterPage() {
 
     if (signUpError) {
       setError(signUpError);
+      toaster.create({
+        title: "Couldn't create your account",
+        description: signUpError,
+        type: "error",
+        duration: 4000,
+        closable: true,
+      });
       return;
     }
+
+    toaster.create({
+      title: "Business registered!",
+      description: "Check your inbox to confirm your email, then sign in.",
+      type: "success",
+      duration: 4000,
+      closable: true,
+    });
 
     setSubmitted(true);
   }

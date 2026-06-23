@@ -14,6 +14,7 @@ import {
 } from "@/helpers/student.helpers";
 import { createClient } from "@/lib/supabase/client";
 import { useOrderRealtime } from "@/hooks/use-order-realtime";
+import { toaster } from "@/components/ui/toaster";
 
 /** Student order history — every order placed, most recent first. */
 export default function OrdersPage() {
@@ -23,11 +24,15 @@ export default function OrdersPage() {
 
   const loadOrders = React.useCallback(async (id: string) => {
     const supabase = createClient();
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("orders")
       .select(ACTIVE_ORDER_COLUMNS)
       .eq("user_id", id)
       .order("created_at", { ascending: false });
+
+    if (error) {
+      toaster.create({ title: "Couldn't load your orders", description: "Something went wrong fetching your order history. Please try again.", type: "error", duration: 4000, closable: true });
+    }
 
     setOrders(((data ?? []) as unknown as RawOrderRow[]).map(toActiveOrder));
   }, []);
