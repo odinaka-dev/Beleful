@@ -10,6 +10,7 @@ import { PasswordField } from "@/components/form/password-field";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { signInWithRole } from "@/lib/auth/sign-in";
 import { ROLE_DASHBOARD_PATH } from "@/lib/auth/roles";
+import { toaster } from "@/components/ui/toaster";
 
 /** Delivery agent login. */
 export default function AgentLoginPage() {
@@ -31,9 +32,24 @@ export default function AgentLoginPage() {
 
     if (signInError) {
       setError(signInError);
+      toaster.create({
+        title: "Couldn't sign you in",
+        description: signInError,
+        type: "error",
+        duration: 4000,
+        closable: true,
+      });
       setLoading(false);
       return;
     }
+
+    toaster.create({
+      title: "Welcome back!",
+      description: "You're signed in. Taking you to your dashboard…",
+      type: "success",
+      duration: 3000,
+      closable: true,
+    });
 
     router.push(ROLE_DASHBOARD_PATH.DELIVERY_AGENT);
     router.refresh();

@@ -25,6 +25,7 @@ export { default as OrderTrackingPage } from "@/screens/student/order-tracking";
 export { default as ExplorePage } from "@/screens/student/explore";
 export { default as OrdersPage } from "@/screens/student/orders";
 export { default as ProfilePage } from "@/screens/student/profile";
+export { default as LoadingComponent } from "@/components/layout/loader";
 
 // agent dashboard imports goes here
 export { default as AgentDashboard } from "@/screens/agent/dashboard";

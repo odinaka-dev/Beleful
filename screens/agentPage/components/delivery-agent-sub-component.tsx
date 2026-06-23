@@ -3,58 +3,8 @@
 import Heading from "@/components/ui/Heading";
 import { BelefulImages } from "@/constant/image";
 import Image from "next/image";
-import { EmptyWallet, Clock, Routing, MedalStar } from "iconsax-reactjs";
 import FrequentlyComponent from "@/components/layout/frequently-asked-questions";
-
-const BENEFITS = [
-  {
-    icon: EmptyWallet,
-    title: "Earn on every drop",
-    description:
-      "Get paid for each delivery you complete, with transparent payouts straight to your wallet.",
-  },
-  {
-    icon: Clock,
-    title: "Fully flexible hours",
-    description:
-      "Go online between lectures, in the evening, or on weekends. You decide when you work.",
-  },
-  {
-    icon: Routing,
-    title: "Stay close to campus",
-    description:
-      "Only get matched with nearby orders, so you never travel far from where you already are.",
-  },
-  {
-    icon: MedalStar,
-    title: "Build your reputation",
-    description:
-      "Great ratings unlock priority orders and help you earn more as a trusted agent.",
-  },
-];
-
-const STEPS = [
-  {
-    title: "Sign up & get verified",
-    description:
-      "Register with your student details and complete a quick verification to join.",
-  },
-  {
-    title: "Accept nearby orders",
-    description:
-      "Browse incoming requests around you and accept the ones that fit your schedule.",
-  },
-  {
-    title: "Pick up the meal",
-    description:
-      "Head to the vendor, confirm the order, and grab the food ready for delivery.",
-  },
-  {
-    title: "Deliver & get paid",
-    description:
-      "Drop off to the student, confirm completion, and watch your earnings grow.",
-  },
-];
+import { BENEFITS, STEPS } from "@/helpers/agent.helpers";
 
 export default function DeliveryAgentSubComponent() {
   return (

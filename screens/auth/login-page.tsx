@@ -13,6 +13,7 @@ import { OrDivider } from "@/components/auth/or-divider";
 import { signInWithRole } from "@/lib/auth/sign-in";
 import { signInWithGoogle } from "@/lib/auth/sign-in-with-google";
 import { ROLE_DASHBOARD_PATH } from "@/lib/auth/roles";
+import { toaster } from "@/components/ui/toaster";
 
 /** Student login. */
 export default function StudentLoginPage() {
@@ -31,6 +32,13 @@ export default function StudentLoginPage() {
     // On success the browser navigates to Google, so we only get here on error.
     if (googleError) {
       setError(googleError);
+      toaster.create({
+        title: "Google sign-in failed",
+        description: googleError,
+        type: "error",
+        duration: 4000,
+        closable: true,
+      });
       setGoogleLoading(false);
     }
   }
@@ -48,9 +56,24 @@ export default function StudentLoginPage() {
 
     if (signInError) {
       setError(signInError);
+      toaster.create({
+        title: "Couldn't sign you in",
+        description: signInError,
+        type: "error",
+        duration: 4000,
+        closable: true,
+      });
       setLoading(false);
       return;
     }
+
+    toaster.create({
+      title: "Welcome back!",
+      description: "You're logged in. Taking you to your dashboard…",
+      type: "success",
+      duration: 3000,
+      closable: true,
+    });
 
     router.push(ROLE_DASHBOARD_PATH.USER);
     router.refresh();

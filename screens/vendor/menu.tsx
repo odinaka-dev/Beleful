@@ -16,6 +16,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { formatNaira } from "@/helpers/vendor.helpers";
 import { createClient } from "@/lib/supabase/client";
 import { uploadOwnFile } from "@/lib/storage/upload";
+import { toaster } from "@/components/ui/toaster";
 
 interface Category {
   id: string;
@@ -168,7 +169,9 @@ export default function VendorMenu() {
     if (imageFile) {
       const { data, error } = await uploadOwnFile("vendor-media", imageFile, "WIDE_PHOTO");
       if (error || !data) {
-        setSaveError(error ?? "Image upload failed.");
+        const message = error ?? "Image upload failed.";
+        setSaveError(message);
+        toaster.create({ title: "Image upload failed", description: message, type: "error", duration: 4000, closable: true });
         setSaving(false);
         return;
       }
@@ -193,11 +196,14 @@ export default function VendorMenu() {
         .single();
 
       if (error || !data) {
-        setSaveError(error?.message ?? "Could not save changes.");
+        const message = error?.message ?? "Could not save changes.";
+        setSaveError(message);
+        toaster.create({ title: "Couldn't save item", description: message, type: "error", duration: 4000, closable: true });
         setSaving(false);
         return;
       }
       setItems((prev) => prev.map((i) => (i.id === data.id ? toRow(data) : i)));
+      toaster.create({ title: "Item updated", description: `“${data.name}” has been saved.`, type: "success", duration: 3000, closable: true });
     } else {
       const { data, error } = await supabase
         .from("menu_items")
@@ -206,11 +212,14 @@ export default function VendorMenu() {
         .single();
 
       if (error || !data) {
-        setSaveError(error?.message ?? "Could not add item.");
+        const message = error?.message ?? "Could not add item.";
+        setSaveError(message);
+        toaster.create({ title: "Couldn't add item", description: message, type: "error", duration: 4000, closable: true });
         setSaving(false);
         return;
       }
       setItems((prev) => [toRow(data), ...prev]);
+      toaster.create({ title: "Item added", description: `“${data.name}” is now on your menu.`, type: "success", duration: 3000, closable: true });
     }
 
     setSaving(false);
@@ -224,9 +233,11 @@ export default function VendorMenu() {
     setActingId(null);
     if (error) {
       setListError(error.message);
+      toaster.create({ title: "Couldn't delete item", description: error.message, type: "error", duration: 4000, closable: true });
       return;
     }
     setItems((prev) => prev.filter((i) => i.id !== id));
+    toaster.create({ title: "Item deleted", type: "success", duration: 3000, closable: true });
   }
 
   async function toggleSoldOut(row: MenuRow) {
@@ -239,8 +250,10 @@ export default function VendorMenu() {
     setActingId(null);
     if (error) {
       setListError(error.message);
+      toaster.create({ title: "Couldn't update availability", description: error.message, type: "error", duration: 4000, closable: true });
       return;
     }
+    toaster.create({ title: row.available ? "Marked sold out" : "Marked available", type: "success", duration: 2500, closable: true });
     setItems((prev) =>
       prev.map((i) => (i.id === row.id ? { ...i, available: !i.available } : i)),
     );

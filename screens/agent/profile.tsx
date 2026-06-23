@@ -19,6 +19,7 @@ import { FileUpload } from "@/components/form/file-upload";
 import type { AgentProfile, VerificationStatus } from "@/helpers/agent.helpers";
 import { createClient } from "@/lib/supabase/client";
 import { uploadOwnFile } from "@/lib/storage/upload";
+import { toaster } from "@/components/ui/toaster";
 import type { Icon } from "iconsax-reactjs";
 
 type ImageStatus = "idle" | "uploading" | "saved" | "error";
@@ -244,8 +245,10 @@ export default function AgentProfile() {
 
     const { data, error } = await uploadOwnFile("agent-documents", file, "DOCUMENT");
     if (error || !data) {
+      const message = error ?? "Upload failed.";
       setIdStatus("error");
-      setIdError(error ?? "Upload failed.");
+      setIdError(message);
+      toaster.create({ title: "ID upload failed", description: message, type: "error", duration: 4000, closable: true });
       return;
     }
 
@@ -267,6 +270,7 @@ export default function AgentProfile() {
     if (updateError) {
       setIdStatus("error");
       setIdError(updateError.message);
+      toaster.create({ title: "ID upload failed", description: updateError.message, type: "error", duration: 4000, closable: true });
       return;
     }
 
@@ -275,6 +279,7 @@ export default function AgentProfile() {
       .createSignedUrl(data.path, 60 * 10);
     setIdDocSignedUrl(signed?.signedUrl ?? null);
     setIdStatus("saved");
+    toaster.create({ title: "Student ID uploaded", description: "Our team will review it within 24 hours.", type: "success", duration: 3500, closable: true });
     setProfile((prev) =>
       prev ? { ...prev, verificationStatus: nextStatus, verified: nextStatus === "verified" } : prev,
     );

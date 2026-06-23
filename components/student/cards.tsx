@@ -15,6 +15,7 @@ import {
   ORDER_STATUS_LABEL,
 } from "@/helpers/student.helpers";
 import { useCart } from "@/provider/cart-provider";
+import { toaster } from "../ui/toaster";
 
 /** Category pill card used in the dashboard category strip. */
 export function CategoryCard({ category }: { category: Category }) {
@@ -22,17 +23,17 @@ export function CategoryCard({ category }: { category: Category }) {
   return (
     <Link
       href={`/user-dashboard/explore?category=${category.id}`}
-      className="group flex flex-col items-center gap-2"
+      className="flex flex-col items-center gap-2 group"
     >
       {category.image ? (
         <img
           src={category.image}
           alt={category.name}
-          className="h-16 w-16 rounded-3xl object-cover shadow-sm transition-transform group-hover:-translate-y-1 sm:h-20 sm:w-20"
+          className="object-cover w-16 h-16 transition-transform shadow-sm rounded-3xl group-hover:-translate-y-1 sm:h-20 sm:w-20"
         />
       ) : (
         <span
-          className="grid h-16 w-16 place-items-center rounded-3xl text-3xl shadow-sm transition-transform group-hover:-translate-y-1 sm:h-20 sm:w-20"
+          className="grid w-16 h-16 text-3xl transition-transform shadow-sm place-items-center rounded-3xl group-hover:-translate-y-1 sm:h-20 sm:w-20"
           style={{ backgroundColor: style.color }}
         >
           {style.emoji}
@@ -57,10 +58,14 @@ export function VendorCard({ vendor }: { vendor: Vendor }) {
           <img
             src={vendor.bannerImage}
             alt={vendor.name}
-            className="h-32 w-full object-cover"
+            className="object-cover w-full h-32"
           />
         ) : (
-          <FoodImage emoji="🍽️" gradient={PLACEHOLDER_GRADIENT} className="h-32 w-full" />
+          <FoodImage
+            emoji="🍽️"
+            gradient={PLACEHOLDER_GRADIENT}
+            className="w-full h-32"
+          />
         )}
         <div className="absolute left-3 top-3">
           <StatusBadge tone={vendor.isOpen ? "success" : "neutral"} dot>
@@ -98,10 +103,21 @@ export function FoodCard({ food }: { food: Food }) {
       vendorName: food.vendorName,
       imageUrl: food.imageUrl,
     });
+
+    // show this
+    toaster.create({
+      title: "Order added to Cart",
+      description: `Your order ${food.name} has been added to your cart, proceed to checkout.`,
+      type: "success",
+      duration: 3000,
+      closable: true,
+    });
+
     if (result.conflict) {
       const replace = window.confirm(
         "Your cart has items from another vendor. Clear your cart and add this item instead?",
       );
+
       if (replace) {
         await add(
           {
@@ -116,16 +132,36 @@ export function FoodCard({ food }: { food: Food }) {
           { replaceVendor: true },
         );
       }
+
+      // show this
+      toaster.create({
+        title: "Order from different vendor",
+        description: `Your order ${food.name} is from another vendor ${food.vendorName}, your current cart would be cleared.`,
+        type: "error",
+        duration: 3000,
+        closable: true,
+      });
     }
   }
 
   return (
     <div className="group flex flex-col overflow-hidden rounded-3xl border border-[#00452E]/10 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(0,0,0,0.1)]">
-      <Link href={`/user-dashboard/store/${food.vendorId}`} className="relative block">
+      <Link
+        href={`/user-dashboard/store/${food.vendorId}`}
+        className="relative block"
+      >
         {food.imageUrl ? (
-          <img src={food.imageUrl} alt={food.name} className="h-32 w-full object-cover" />
+          <img
+            src={food.imageUrl}
+            alt={food.name}
+            className="object-cover w-full h-32"
+          />
         ) : (
-          <FoodImage emoji="🍽️" gradient={PLACEHOLDER_GRADIENT} className="h-32 w-full" />
+          <FoodImage
+            emoji="🍽️"
+            gradient={PLACEHOLDER_GRADIENT}
+            className="w-full h-32"
+          />
         )}
         {food.soldOut && (
           <span className="absolute left-3 top-3">
@@ -133,10 +169,12 @@ export function FoodCard({ food }: { food: Food }) {
           </span>
         )}
       </Link>
-      <div className="flex flex-1 flex-col p-4">
-        <h3 className="font-heading text-sm font-bold text-[#111111]">{food.name}</h3>
+      <div className="flex flex-col flex-1 p-4">
+        <h3 className="font-heading text-sm font-bold text-[#111111]">
+          {food.name}
+        </h3>
         <p className="mt-1 text-xs text-[#666666]">{food.vendorName}</p>
-        <div className="mt-3 flex items-center justify-between">
+        <div className="flex items-center justify-between mt-3">
           <span className="font-heading font-bold text-[#00452E]">
             {formatNaira(food.price)}
           </span>
@@ -154,7 +192,10 @@ export function FoodCard({ food }: { food: Food }) {
   );
 }
 
-const STATUS_TONE: Record<ActiveOrder["status"], "info" | "pending" | "success" | "danger"> = {
+const STATUS_TONE: Record<
+  ActiveOrder["status"],
+  "info" | "pending" | "success" | "danger"
+> = {
   pending: "info",
   preparing: "pending",
   ready: "pending",
@@ -186,12 +227,15 @@ export function ActiveOrderCard({ order }: { order: ActiveOrder }) {
             {order.agentName ? "Delivery agent" : "Items"}
           </p>
           <p className="text-sm font-semibold text-[#111111]">
-            {order.agentName ?? `${order.itemsCount} item${order.itemsCount === 1 ? "" : "s"}`}
+            {order.agentName ??
+              `${order.itemsCount} item${order.itemsCount === 1 ? "" : "s"}`}
           </p>
         </div>
         <div className="text-right">
           <p className="text-xs text-[#666666]">Total</p>
-          <p className="text-sm font-bold text-[#00452E]">{formatNaira(order.total)}</p>
+          <p className="text-sm font-bold text-[#00452E]">
+            {formatNaira(order.total)}
+          </p>
         </div>
       </div>
     </Link>
