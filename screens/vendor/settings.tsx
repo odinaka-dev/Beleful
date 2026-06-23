@@ -5,11 +5,9 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-shell";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FormField } from "@/components/form/form-field";
-import { SelectField } from "@/components/form/select-field";
 import { FileUpload } from "@/components/form/file-upload";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { cn } from "@/lib/utils";
-import { SCHOOLS } from "@/helpers/auth.helpers";
 import { OPENING_HOURS, type OpeningHour } from "@/helpers/vendor.helpers";
 import { createClient } from "@/lib/supabase/client";
 import { uploadOwnFile } from "@/lib/storage/upload";
@@ -125,7 +123,7 @@ export default function VendorSettings() {
             .single(),
           supabase
             .from("profiles")
-            .select("full_name, email, phone_number, school")
+            .select("full_name, email, phone_number, schools(name)")
             .eq("id", userData.user.id)
             .single(),
         ]);
@@ -152,7 +150,7 @@ export default function VendorSettings() {
             vendorName: prof.full_name ?? "",
             email: prof.email ?? "",
             phone: prof.phone_number ?? "",
-            school: prof.school ?? "",
+            school: prof.schools?.name ?? "",
           }));
           setOriginalEmail(prof.email ?? "");
         }
@@ -277,7 +275,6 @@ export default function VendorSettings() {
       .update({
         full_name: profile.vendorName,
         phone_number: profile.phone,
-        school: profile.school,
       })
       .eq("id", userData.user.id);
 
@@ -426,11 +423,10 @@ export default function VendorSettings() {
               value={profile.phone}
               onChange={set("phone")}
             />
-            <SelectField
+            <FormField
               label="School / Campus"
-              options={SCHOOLS}
               value={profile.school}
-              onChange={set("school")}
+              readOnly
             />
             <FormField
               label="CAC number"

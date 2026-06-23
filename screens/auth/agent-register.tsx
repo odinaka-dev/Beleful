@@ -10,14 +10,14 @@ import { SelectField } from "@/components/form/select-field";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { CheckEmailNotice } from "@/components/auth/check-email-notice";
-import { SCHOOLS, HOSTELS } from "@/helpers/auth.helpers";
 import { signUpWithRole } from "@/lib/auth/sign-up";
+import { useSchools } from "@/hooks/use-schools";
 
 interface AgentForm {
   fullName: string;
   email: string;
   phone: string;
-  school: string;
+  schoolId: string;
   studentId: string;
   hostel: string;
   password: string;
@@ -27,7 +27,7 @@ const EMPTY: AgentForm = {
   fullName: "",
   email: "",
   phone: "",
-  school: "",
+  schoolId: "",
   studentId: "",
   hostel: "",
   password: "",
@@ -35,6 +35,7 @@ const EMPTY: AgentForm = {
 
 /** Delivery agent registration. */
 export default function AgentRegisterPage() {
+  const { schools, loading: schoolsLoading, error: schoolsError } = useSchools();
   const [form, setForm] = useState<AgentForm>(EMPTY);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -55,7 +56,7 @@ export default function AgentRegisterPage() {
       {
         full_name: form.fullName,
         phone_number: form.phone,
-        school: form.school,
+        school_id: form.schoolId,
         hostel: form.hostel,
         matric_number: form.studentId,
       },
@@ -153,11 +154,13 @@ export default function AgentRegisterPage() {
 
           <SelectField
             label="School"
-            options={SCHOOLS}
+            options={schools}
             placeholder="Select your school"
             required
-            value={form.school}
-            onChange={set("school")}
+            disabled={schoolsLoading}
+            value={form.schoolId}
+            onChange={set("schoolId")}
+            error={schoolsError ?? undefined}
           />
 
           <div className="grid gap-5 sm:grid-cols-2">
@@ -171,13 +174,13 @@ export default function AgentRegisterPage() {
                 <CardIcon size={18} variant="TwoTone" color="#666666" />
               }
             />
-            <SelectField
-              label="Hostel"
-              options={HOSTELS}
-              placeholder="Select residence"
+            <FormField
+              label="Hostel / Residence"
+              placeholder="e.g. Jaja Hall or an off-campus lodge"
               required
               value={form.hostel}
               onChange={set("hostel")}
+              maxLength={160}
             />
           </div>
 

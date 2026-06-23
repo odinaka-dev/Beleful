@@ -10,14 +10,14 @@ import { SelectField } from "@/components/form/select-field";
 import { CheckboxField } from "@/components/form/checkbox-field";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { CheckEmailNotice } from "@/components/auth/check-email-notice";
-import { SCHOOLS, HOSTELS } from "@/helpers/auth.helpers";
 import { signUpWithRole } from "@/lib/auth/sign-up";
+import { useSchools } from "@/hooks/use-schools";
 
 interface StudentForm {
   fullName: string;
   email: string;
   phone: string;
-  school: string;
+  schoolId: string;
   hostel: string;
   password: string;
   confirmPassword: string;
@@ -27,7 +27,7 @@ const EMPTY: StudentForm = {
   fullName: "",
   email: "",
   phone: "",
-  school: "",
+  schoolId: "",
   hostel: "",
   password: "",
   confirmPassword: "",
@@ -35,6 +35,7 @@ const EMPTY: StudentForm = {
 
 /** Student signup. */
 export default function StudentSignupPage() {
+  const { schools, loading: schoolsLoading, error: schoolsError } = useSchools();
   const [form, setForm] = useState<StudentForm>(EMPTY);
   const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -60,7 +61,7 @@ export default function StudentSignupPage() {
       {
         full_name: form.fullName,
         phone_number: form.phone,
-        school: form.school,
+        school_id: form.schoolId,
         hostel: form.hostel,
       },
     );
@@ -137,19 +138,21 @@ export default function StudentSignupPage() {
         <div className="grid gap-5 sm:grid-cols-2">
           <SelectField
             label="School"
-            options={SCHOOLS}
+            options={schools}
             placeholder="Select your school"
             required
-            value={form.school}
-            onChange={set("school")}
+            disabled={schoolsLoading}
+            value={form.schoolId}
+            onChange={set("schoolId")}
+            error={schoolsError ?? undefined}
           />
-          <SelectField
+          <FormField
             label="Hostel / Residence"
-            options={HOSTELS}
-            placeholder="Select residence"
+            placeholder="e.g. Moremi Hall or an off-campus lodge"
             required
             value={form.hostel}
             onChange={set("hostel")}
+            maxLength={160}
           />
         </div>
 

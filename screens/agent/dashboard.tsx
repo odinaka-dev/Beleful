@@ -19,6 +19,7 @@ import { StatCard } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { StatCardSkeleton } from "@/components/ui/skeletons";
 import { PrimaryButton } from "@/components/ui/primary-button";
+import { LiveUpdateNotice } from "@/components/ui/live-update-status";
 import {
   DELIVERY_STAGES,
   formatNaira,
@@ -27,6 +28,7 @@ import {
   type DeliveryStage,
 } from "@/helpers/agent.helpers";
 import { createClient } from "@/lib/supabase/client";
+import { useOrderRealtime } from "@/hooks/use-order-realtime";
 
 /** No per-vendor emoji data exists in the schema yet — one neutral fallback. */
 const VENDOR_EMOJI = "🍱";
@@ -552,26 +554,28 @@ export default function AgentDashboard() {
     };
   }, [load]);
 
-  React.useEffect(() => {
+  // Reset the PIN entry whenever the active delivery changes. Done during
+  // render (the React "adjust state when a prop changes" pattern) rather than
+  // in an effect, so it doesn't trigger a cascading second render.
+  const [prevActiveId, setPrevActiveId] = React.useState(active?.id);
+  if (active?.id !== prevActiveId) {
+    setPrevActiveId(active?.id);
     setPinInput("");
     setPinError(null);
-  }, [active?.id]);
+  }
 
-  React.useEffect(() => {
-    if (!agentId || verification !== "verified") return;
-    const supabase = createClient();
-    const channel = supabase
-      .channel(`agent-orders-${agentId}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "orders" },
-        () => load(agentId),
-      )
-      .subscribe();
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [agentId, verification, load]);
+  const refreshLiveOrders = React.useCallback(() => {
+    if (agentId && verification === "verified") return load(agentId);
+  }, [agentId, load, verification]);
+
+  const liveStatus = useOrderRealtime({
+    channelName: `agent-orders-${agentId ?? "pending"}`,
+    enabled: !!agentId && verification === "verified",
+    onChange: refreshLiveOrders,
+    // An order claimed by another agent becomes invisible through RLS, so
+    // periodically reconcile the available queue as a correctness fallback.
+    reconciliationIntervalMs: 15_000,
+  });
 
   async function acceptDelivery(id: string) {
     if (!agentId) return;
@@ -689,6 +693,8 @@ export default function AgentDashboard() {
           {error}
         </p>
       )}
+
+      <LiveUpdateNotice status={liveStatus} />
 
       {/* Metrics */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">

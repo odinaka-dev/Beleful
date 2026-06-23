@@ -27,7 +27,7 @@ interface RawProfileRow {
   full_name: string | null;
   email: string | null;
   phone_number: string | null;
-  school: string | null;
+  schools: { name: string } | null;
   created_at: string | null;
 }
 
@@ -49,7 +49,7 @@ function toAgentProfile(profile: RawProfileRow, agent: RawAgentRow): AgentProfil
     name: profile.full_name ?? "Agent",
     email: profile.email ?? "",
     phone: profile.phone_number ?? "",
-    school: profile.school ?? "",
+    school: profile.schools?.name ?? "",
     studentId: agent.matric_number ?? "",
     hostel: agent.hostel ?? "",
     verified: verificationStatus === "verified",
@@ -138,7 +138,7 @@ export default function AgentProfile() {
       const [{ data: rawProfile }, { data: rawAgent }] = await Promise.all([
         supabase
           .from("profiles")
-          .select("avatar_url, full_name, email, phone_number, school, created_at")
+          .select("avatar_url, full_name, email, phone_number, created_at, schools(name)")
           .eq("id", userData.user.id)
           .single(),
         supabase

@@ -246,6 +246,7 @@ export type Database = {
           landmark: string | null
           pin_attempts: number
           pin_locked: boolean
+          school_id: string
           status: string | null
           total_amount: number | null
           user_id: string | null
@@ -262,6 +263,7 @@ export type Database = {
           landmark?: string | null
           pin_attempts?: number
           pin_locked?: boolean
+          school_id: string
           status?: string | null
           total_amount?: number | null
           user_id?: string | null
@@ -278,6 +280,7 @@ export type Database = {
           landmark?: string | null
           pin_attempts?: number
           pin_locked?: boolean
+          school_id?: string
           status?: string | null
           total_amount?: number | null
           user_id?: string | null
@@ -289,6 +292,13 @@ export type Database = {
             columns: ["delivery_agent_id"]
             isOneToOne: false
             referencedRelation: "delivery_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
             referencedColumns: ["id"]
           },
           {
@@ -318,6 +328,7 @@ export type Database = {
           phone_number: string | null
           role: Database["public"]["Enums"]["user_role"]
           school: string | null
+          school_id: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -329,6 +340,7 @@ export type Database = {
           phone_number?: string | null
           role: Database["public"]["Enums"]["user_role"]
           school?: string | null
+          school_id?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -340,8 +352,17 @@ export type Database = {
           phone_number?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           school?: string | null
+          school_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ratings: {
         Row: {
@@ -391,6 +412,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      schools: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          name: string
+          short_name: string
+          slug: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name: string
+          short_name: string
+          slug: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name?: string
+          short_name?: string
+          slug?: string
+        }
+        Relationships: []
       }
       transactions: {
         Row: {
@@ -524,6 +572,7 @@ export type Database = {
           landmark: string | null
           pin_attempts: number
           pin_locked: boolean
+          school_id: string
           status: string | null
           total_amount: number | null
           user_id: string | null
@@ -570,6 +619,10 @@ export type Database = {
       }
       is_admin: { Args: never; Returns: boolean }
       is_verified_agent: { Args: never; Returns: boolean }
+      profile_related_via_order: {
+        Args: { p_profile_id: string }
+        Returns: boolean
+      }
       unlock_order_pin: {
         Args: { p_order_id: string }
         Returns: {
@@ -583,6 +636,7 @@ export type Database = {
           landmark: string | null
           pin_attempts: number
           pin_locked: boolean
+          school_id: string
           status: string | null
           total_amount: number | null
           user_id: string | null

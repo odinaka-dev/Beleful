@@ -8,7 +8,7 @@ import type { Role } from "@/lib/auth/roles";
 export interface SignUpMetadata {
   full_name?: string;
   phone_number?: string;
-  school?: string;
+  school_id?: string;
   hostel?: string;
   business_name?: string;
   address?: string;

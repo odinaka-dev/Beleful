@@ -12,6 +12,7 @@ import {
 import { EmptyState } from "@/components/ui/empty-state";
 import { MediaCardSkeleton } from "@/components/ui/skeletons";
 import { Skeleton } from "@/components/ui/skeleton";
+import { LiveUpdateNotice } from "@/components/ui/live-update-status";
 import {
   type Category,
   type Vendor,
@@ -28,6 +29,7 @@ import {
   toActiveOrder,
 } from "@/helpers/student.helpers";
 import { createClient } from "@/lib/supabase/client";
+import { useOrderRealtime } from "@/hooks/use-order-realtime";
 
 function SectionHeader({ title, href }: { title: string; href?: string }) {
   return (
@@ -55,6 +57,24 @@ export default function StudentDashboard() {
   const [vendors, setVendors] = React.useState<Vendor[]>([]);
   const [foods, setFoods] = React.useState<Food[]>([]);
   const [activeOrders, setActiveOrders] = React.useState<ActiveOrder[]>([]);
+  const [userId, setUserId] = React.useState<string | null>(null);
+
+  const loadActiveOrders = React.useCallback(async (id: string) => {
+    const supabase = createClient();
+    const { data, error: orderError } = await supabase
+      .from("orders")
+      .select(ACTIVE_ORDER_COLUMNS)
+      .eq("user_id", id)
+      .in("status", ["pending", "preparing", "ready"])
+      .order("created_at", { ascending: false });
+
+    if (orderError) setError(orderError.message);
+    else {
+      setActiveOrders(
+        ((data ?? []) as unknown as RawOrderRow[]).map(toActiveOrder),
+      );
+    }
+  }, []);
 
   React.useEffect(() => {
     let active = true;
@@ -62,6 +82,7 @@ export default function StudentDashboard() {
       const supabase = createClient();
       const { data: userData } = await supabase.auth.getUser();
       const userId = userData.user?.id;
+      setUserId(userId ?? null);
 
       const [catRes, vendorRes, foodRes, orderRes] = await Promise.all([
         supabase.from("food_categories").select("id, name, image").order("name"),
@@ -102,6 +123,17 @@ export default function StudentDashboard() {
     };
   }, []);
 
+  const refreshActiveOrders = React.useCallback(() => {
+    if (userId) return loadActiveOrders(userId);
+  }, [loadActiveOrders, userId]);
+
+  const liveStatus = useOrderRealtime({
+    channelName: `student-dashboard-orders-${userId ?? "pending"}`,
+    enabled: !!userId,
+    filter: userId ? `user_id=eq.${userId}` : undefined,
+    onChange: refreshActiveOrders,
+  });
+
   return (
     <div className="flex flex-col gap-10">
       {/* Welcome / hero */}
@@ -121,6 +153,8 @@ export default function StudentDashboard() {
           {error}
         </p>
       )}
+
+      {userId && <LiveUpdateNotice status={liveStatus} />}
 
       {/* Categories */}
       <section>

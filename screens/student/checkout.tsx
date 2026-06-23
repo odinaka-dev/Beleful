@@ -4,12 +4,10 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Card as CardIcon, Wallet3, TickCircle } from "iconsax-reactjs";
 import { FormField } from "@/components/form/form-field";
-import { SelectField } from "@/components/form/select-field";
 import { OrderSummary } from "@/components/student/order-summary";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { formatNaira } from "@/helpers/student.helpers";
-import { HOSTELS } from "@/helpers/auth.helpers";
 import { useCart } from "@/provider/cart-provider";
 import { createClient } from "@/lib/supabase/client";
 import { initiatePayment } from "@/lib/payments/paystack";
@@ -97,15 +95,16 @@ export default function CheckoutPage() {
               Delivery information
             </h2>
             <div className="flex flex-col gap-4">
-              <SelectField
+              <FormField
                 label="Hostel / Residence"
-                options={HOSTELS}
-                placeholder="Select your hostel"
+                placeholder="Enter your delivery location"
                 required
                 value={delivery.hostel}
                 onChange={(e) =>
                   setDelivery({ ...delivery, hostel: e.target.value })
                 }
+                minLength={2}
+                maxLength={160}
               />
               <FormField
                 label="Building / Room / Landmark"
@@ -115,6 +114,7 @@ export default function CheckoutPage() {
                 onChange={(e) =>
                   setDelivery({ ...delivery, landmark: e.target.value })
                 }
+                maxLength={240}
               />
             </div>
           </section>
