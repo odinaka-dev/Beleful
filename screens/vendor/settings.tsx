@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { OPENING_HOURS, type OpeningHour } from "@/helpers/vendor.helpers";
 import { createClient } from "@/lib/supabase/client";
 import { uploadOwnFile } from "@/lib/storage/upload";
+import { toaster } from "@/components/ui/toaster";
 import type { Json } from "@/lib/supabase/database.types";
 
 type ImageStatus = "idle" | "uploading" | "saved" | "error";
@@ -267,6 +268,7 @@ export default function VendorSettings() {
     if (vendorError) {
       setSaveStatus("error");
       setSaveError(vendorError.message);
+      toaster.create({ title: "Couldn't save settings", description: vendorError.message, type: "error", duration: 4000, closable: true });
       return;
     }
 
@@ -281,6 +283,7 @@ export default function VendorSettings() {
     if (profileError) {
       setSaveStatus("error");
       setSaveError(profileError.message);
+      toaster.create({ title: "Couldn't save settings", description: profileError.message, type: "error", duration: 4000, closable: true });
       return;
     }
 
@@ -291,6 +294,7 @@ export default function VendorSettings() {
       if (emailError) {
         setSaveStatus("error");
         setSaveError(emailError.message);
+        toaster.create({ title: "Couldn't update email", description: emailError.message, type: "error", duration: 4000, closable: true });
         return;
       }
       setSaveNote(
@@ -299,6 +303,7 @@ export default function VendorSettings() {
     }
 
     setSaveStatus("saved");
+    toaster.create({ title: "Settings saved", description: "Your store details have been updated.", type: "success", duration: 3000, closable: true });
   }
 
   return (

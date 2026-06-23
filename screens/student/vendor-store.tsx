@@ -22,6 +22,7 @@ import {
 } from "@/helpers/student.helpers";
 import { useCart } from "@/provider/cart-provider";
 import { createClient } from "@/lib/supabase/client";
+import { toaster } from "@/components/ui/toaster";
 
 /** Vendor store: banner, logo, rating, menu categories, food grid, cart bar. */
 export default function VendorStorePage({ vendorId }: { vendorId: string }) {
@@ -57,7 +58,9 @@ export default function VendorStorePage({ vendorId }: { vendorId: string }) {
         .order("created_at", { ascending: false });
 
       if (!isActive) return;
-      if (!menuError) {
+      if (menuError) {
+        toaster.create({ title: "Couldn't load the menu", description: "We couldn't fetch this vendor's dishes. Please try again.", type: "error", duration: 4000, closable: true });
+      } else {
         setMenu(((menuRows ?? []) as unknown as RawFoodRow[]).map(toFood));
       }
       setLoading(false);

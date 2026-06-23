@@ -12,6 +12,7 @@ import { useCart } from "@/provider/cart-provider";
 import { createClient } from "@/lib/supabase/client";
 import { initiatePayment } from "@/lib/payments/paystack";
 import { cn } from "@/lib/utils";
+import { toaster } from "@/components/ui/toaster";
 
 type PaymentMethod = "card" | "wallet";
 
@@ -59,17 +60,41 @@ export default function CheckoutPage() {
       .single();
 
     if (orderError || !data) {
-      setError(orderError?.message ?? "Could not place order.");
+      const message = orderError?.message ?? "Could not place order.";
+      setError(message);
+      toaster.create({
+        title: "Order failed",
+        description: message,
+        type: "error",
+        duration: 4000,
+        closable: true,
+      });
       setPlacing(false);
       return;
     }
 
     const payment = await initiatePayment(data.id, data.total_amount);
     if (!payment.ok) {
-      setError(payment.error ?? "Payment could not be processed.");
+      const message = payment.error ?? "Payment could not be processed.";
+      setError(message);
+      toaster.create({
+        title: "Payment failed",
+        description: message,
+        type: "error",
+        duration: 4000,
+        closable: true,
+      });
       setPlacing(false);
       return;
     }
+
+    toaster.create({
+      title: "Order placed!",
+      description: "Payment confirmed — tracking your order now.",
+      type: "success",
+      duration: 3000,
+      closable: true,
+    });
 
     await clear();
     router.push(`/user-dashboard/orders/${data.id}`);

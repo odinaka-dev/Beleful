@@ -12,6 +12,7 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { CheckEmailNotice } from "@/components/auth/check-email-notice";
 import { signUpWithRole } from "@/lib/auth/sign-up";
 import { useSchools } from "@/hooks/use-schools";
+import { toaster } from "@/components/ui/toaster";
 
 interface AgentForm {
   fullName: string;
@@ -66,8 +67,23 @@ export default function AgentRegisterPage() {
 
     if (signUpError) {
       setError(signUpError);
+      toaster.create({
+        title: "Couldn't create your account",
+        description: signUpError,
+        type: "error",
+        duration: 4000,
+        closable: true,
+      });
       return;
     }
+
+    toaster.create({
+      title: "Account created!",
+      description: "Check your inbox to confirm your email, then sign in.",
+      type: "success",
+      duration: 4000,
+      closable: true,
+    });
 
     setSubmitted(true);
   }
