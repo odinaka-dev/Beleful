@@ -8,11 +8,13 @@ import { DataTable, type Column } from "@/components/ui/data-table";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { TableSkeleton } from "@/components/ui/skeletons";
+import { LiveUpdateNotice } from "@/components/ui/live-update-status";
 import {
   formatNaira,
   type EarningRow,
 } from "@/helpers/agent.helpers";
 import { createClient } from "@/lib/supabase/client";
+import { useOrderRealtime } from "@/hooks/use-order-realtime";
 
 interface RawEarningRow {
   id: string;
@@ -70,6 +72,35 @@ export default function AgentEarnings() {
   const [rows, setRows] = React.useState<EarningRow[]>([]);
   const [total, setTotal] = React.useState(0);
   const [pending, setPending] = React.useState(0);
+  const [agentId, setAgentId] = React.useState<string | null>(null);
+
+  const loadEarnings = React.useCallback(async (id: string) => {
+    const supabase = createClient();
+    const { data, error: ordersError } = await supabase
+      .from("orders")
+      .select(EARNINGS_SELECT)
+      .eq("delivery_agent_id", id)
+      .in("status", ["completed", "ready"])
+      .order("created_at", { ascending: false });
+
+    if (ordersError) {
+      setError(ordersError.message);
+      return;
+    }
+
+    const raw = (data ?? []) as unknown as RawEarningRow[];
+    setRows(raw.map(toEarningRow));
+    setTotal(
+      raw
+        .filter((row) => row.status === "completed")
+        .reduce((sum, row) => sum + Number(row.delivery_fee ?? 0), 0),
+    );
+    setPending(
+      raw
+        .filter((row) => row.status !== "completed")
+        .reduce((sum, row) => sum + Number(row.delivery_fee ?? 0), 0),
+    );
+  }, []);
 
   React.useEffect(() => {
     let active = true;
@@ -94,38 +125,26 @@ export default function AgentEarnings() {
         return;
       }
 
-      const { data, error: ordersError } = await supabase
-        .from("orders")
-        .select(EARNINGS_SELECT)
-        .eq("delivery_agent_id", agent.id)
-        .in("status", ["completed", "ready"])
-        .order("created_at", { ascending: false });
-
+      setAgentId(agent.id);
+      await loadEarnings(agent.id);
       if (!active) return;
-      if (ordersError) {
-        setError(ordersError.message);
-        setLoading(false);
-        return;
-      }
-
-      const raw = (data ?? []) as unknown as RawEarningRow[];
-      setRows(raw.map(toEarningRow));
-      setTotal(
-        raw
-          .filter((r) => r.status === "completed")
-          .reduce((sum, r) => sum + Number(r.delivery_fee ?? 0), 0),
-      );
-      setPending(
-        raw
-          .filter((r) => r.status !== "completed")
-          .reduce((sum, r) => sum + Number(r.delivery_fee ?? 0), 0),
-      );
       setLoading(false);
     })();
     return () => {
       active = false;
     };
-  }, []);
+  }, [loadEarnings]);
+
+  const refreshEarnings = React.useCallback(() => {
+    if (agentId) return loadEarnings(agentId);
+  }, [agentId, loadEarnings]);
+
+  const liveStatus = useOrderRealtime({
+    channelName: `agent-earnings-${agentId ?? "pending"}`,
+    enabled: !!agentId,
+    filter: agentId ? `delivery_agent_id=eq.${agentId}` : undefined,
+    onChange: refreshEarnings,
+  });
 
   return (
     <div>
@@ -148,6 +167,8 @@ export default function AgentEarnings() {
           {error}
         </p>
       )}
+
+      {agentId && <LiveUpdateNotice status={liveStatus} />}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatCard

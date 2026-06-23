@@ -5,6 +5,7 @@ import { ReceiptItem } from "iconsax-reactjs";
 import { ActiveOrderCard } from "@/components/student/cards";
 import { EmptyState } from "@/components/ui/empty-state";
 import { MediaCardSkeleton } from "@/components/ui/skeletons";
+import { LiveUpdateNotice } from "@/components/ui/live-update-status";
 import {
   type ActiveOrder,
   type RawOrderRow,
@@ -12,11 +13,24 @@ import {
   toActiveOrder,
 } from "@/helpers/student.helpers";
 import { createClient } from "@/lib/supabase/client";
+import { useOrderRealtime } from "@/hooks/use-order-realtime";
 
 /** Student order history — every order placed, most recent first. */
 export default function OrdersPage() {
   const [orders, setOrders] = React.useState<ActiveOrder[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [userId, setUserId] = React.useState<string | null>(null);
+
+  const loadOrders = React.useCallback(async (id: string) => {
+    const supabase = createClient();
+    const { data } = await supabase
+      .from("orders")
+      .select(ACTIVE_ORDER_COLUMNS)
+      .eq("user_id", id)
+      .order("created_at", { ascending: false });
+
+    setOrders(((data ?? []) as unknown as RawOrderRow[]).map(toActiveOrder));
+  }, []);
 
   React.useEffect(() => {
     let active = true;
@@ -28,26 +42,35 @@ export default function OrdersPage() {
         return;
       }
 
-      const { data } = await supabase
-        .from("orders")
-        .select(ACTIVE_ORDER_COLUMNS)
-        .eq("user_id", userData.user.id)
-        .order("created_at", { ascending: false });
+      setUserId(userData.user.id);
+      await loadOrders(userData.user.id);
 
       if (!active) return;
-      setOrders(((data ?? []) as unknown as RawOrderRow[]).map(toActiveOrder));
       setLoading(false);
     })();
     return () => {
       active = false;
     };
-  }, []);
+  }, [loadOrders]);
+
+  const refreshOrders = React.useCallback(() => {
+    if (userId) return loadOrders(userId);
+  }, [loadOrders, userId]);
+
+  const liveStatus = useOrderRealtime({
+    channelName: `student-orders-${userId ?? "pending"}`,
+    enabled: !!userId,
+    filter: userId ? `user_id=eq.${userId}` : undefined,
+    onChange: refreshOrders,
+  });
 
   return (
     <div>
       <h1 className="mb-6 font-heading text-2xl font-bold text-[#111111]">
         Your orders
       </h1>
+
+      {userId && <LiveUpdateNotice status={liveStatus} />}
 
       {loading ? (
         <div className="grid gap-4 sm:grid-cols-2">

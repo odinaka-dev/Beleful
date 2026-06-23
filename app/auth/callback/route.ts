@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { ROLE_DASHBOARD_PATH, type Role } from "@/lib/auth/roles";
+import { ROLE_DASHBOARD_PATH } from "@/lib/auth/roles";
 
 /**
  * OAuth callback. Google sends the user back here with a `code`; we exchange it
@@ -13,7 +13,6 @@ import { ROLE_DASHBOARD_PATH, type Role } from "@/lib/auth/roles";
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const role = (searchParams.get("role") as Role | null) ?? "USER";
 
   const forwardedHost = request.headers.get("x-forwarded-host");
   const isLocal = process.env.NODE_ENV === "development";
@@ -40,8 +39,8 @@ export async function GET(request: Request) {
 
   // Existing accounts already have a profile (and a role) — honour it so a
   // vendor who taps "Continue with Google" still lands on the vendor side.
-  // New Google accounts have no profile yet, so create one with the role the
-  // portal asked for.
+  // New Google accounts are always students. Operational roles must not come
+  // from a user-controlled callback parameter.
   const { data: profile } = await supabase
     .from("profiles")
     .select("role")
@@ -55,9 +54,9 @@ export async function GET(request: Request) {
       email: user.email ?? null,
       full_name: meta.full_name ?? meta.name ?? null,
       avatar_url: meta.avatar_url ?? meta.picture ?? null,
-      role,
+      role: "USER",
     });
-    return NextResponse.redirect(`${base}${ROLE_DASHBOARD_PATH[role]}`);
+    return NextResponse.redirect(`${base}${ROLE_DASHBOARD_PATH.USER}`);
   }
 
   return NextResponse.redirect(`${base}${ROLE_DASHBOARD_PATH[profile.role]}`);

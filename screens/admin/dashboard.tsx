@@ -65,7 +65,7 @@ interface RawAgentRow {
     full_name: string | null;
     email: string | null;
     phone_number: string | null;
-    school: string | null;
+    schools: { name: string } | null;
   } | null;
 }
 
@@ -85,12 +85,12 @@ function toPendingAgent(row: RawAgentRow): PendingAgent {
     name: row.profiles?.full_name ?? "Agent",
     email: row.profiles?.email ?? "—",
     phone: row.profiles?.phone_number ?? "—",
-    school: row.profiles?.school ?? "—",
+    school: row.profiles?.schools?.name ?? "—",
   };
 }
 
 const SELECT =
-  "id, hostel, matric_number, verification_status, student_id_image, profiles(full_name, email, phone_number, school)";
+  "id, hostel, matric_number, verification_status, student_id_image, profiles(full_name, email, phone_number, schools(name))";
 
 interface LockedOrder {
   id: string;

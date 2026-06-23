@@ -15,6 +15,7 @@ import { Card, StatCard } from "@/components/ui/card";
 import { TrendChart } from "@/components/dashboard/trend-chart";
 import { EmptyState } from "@/components/ui/empty-state";
 import { StatCardSkeleton, TableSkeleton } from "@/components/ui/skeletons";
+import { LiveUpdateNotice } from "@/components/ui/live-update-status";
 import { OrderStatusBadge } from "@/components/vendor/order-status";
 import {
   formatNaira,
@@ -24,6 +25,7 @@ import {
   type VendorOrderStatus,
 } from "@/helpers/vendor.helpers";
 import { createClient } from "@/lib/supabase/client";
+import { useOrderRealtime } from "@/hooks/use-order-realtime";
 
 interface DashboardMetrics {
   revenueToday: number;
@@ -254,27 +256,16 @@ export default function VendorDashboard() {
     };
   }, [load]);
 
-  React.useEffect(() => {
-    if (!vendorId) return;
-    const supabase = createClient();
-    const channel = supabase
-      .channel(`vendor-orders-${vendorId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "orders",
-          filter: `vendor_id=eq.${vendorId}`,
-        },
-        () => load(vendorId),
-      )
-      .subscribe();
+  const refreshLiveOrders = React.useCallback(() => {
+    if (vendorId) return load(vendorId);
+  }, [load, vendorId]);
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [vendorId, load]);
+  const liveStatus = useOrderRealtime({
+    channelName: `vendor-orders-${vendorId ?? "pending"}`,
+    enabled: !!vendorId,
+    filter: vendorId ? `vendor_id=eq.${vendorId}` : undefined,
+    onChange: refreshLiveOrders,
+  });
 
   async function updateOrder(id: string, status: VendorOrderStatus) {
     setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status } : o)));
@@ -301,6 +292,8 @@ export default function VendorDashboard() {
           {error}
         </p>
       )}
+
+      {vendorId && <LiveUpdateNotice status={liveStatus} />}
 
       {/* Metrics */}
       {loading ? (

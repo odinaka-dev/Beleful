@@ -7,6 +7,7 @@ import { Call, Messages2, Star1, ShieldTick } from "iconsax-reactjs";
 import { OrderTimeline } from "@/components/student/order-timeline";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { PrimaryButton } from "@/components/ui/primary-button";
+import { LiveUpdateNotice } from "@/components/ui/live-update-status";
 import {
   ORDER_STATUS_LABEL,
   buildOrderSteps,
@@ -14,6 +15,7 @@ import {
   type OrderStatus,
 } from "@/helpers/student.helpers";
 import { createClient } from "@/lib/supabase/client";
+import { useOrderRealtime } from "@/hooks/use-order-realtime";
 
 interface OrderDetail {
   id: string;
@@ -94,20 +96,11 @@ export default function OrderTrackingPage({ orderId }: { orderId: string }) {
     };
   }, [load]);
 
-  React.useEffect(() => {
-    const supabase = createClient();
-    const channel = supabase
-      .channel(`order-${orderId}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "orders", filter: `id=eq.${orderId}` },
-        () => load(),
-      )
-      .subscribe();
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [orderId, load]);
+  const liveStatus = useOrderRealtime({
+    channelName: `student-order-${orderId}`,
+    filter: `id=eq.${orderId}`,
+    onChange: load,
+  });
 
   if (missing) notFound();
 
@@ -136,6 +129,8 @@ export default function OrderTrackingPage({ orderId }: { orderId: string }) {
           {ORDER_STATUS_LABEL[order.status]}
         </StatusBadge>
       </div>
+
+      <LiveUpdateNotice status={liveStatus} />
 
       <div className="grid gap-6 lg:grid-cols-[1fr_380px] lg:items-start">
         {/* Timeline */}

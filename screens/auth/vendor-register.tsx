@@ -10,15 +10,15 @@ import { SelectField } from "@/components/form/select-field";
 import { FileUpload } from "@/components/form/file-upload";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { CheckEmailNotice } from "@/components/auth/check-email-notice";
-import { SCHOOLS } from "@/helpers/auth.helpers";
 import { signUpWithRole } from "@/lib/auth/sign-up";
+import { useSchools } from "@/hooks/use-schools";
 
 interface VendorForm {
   businessName: string;
   vendorName: string;
   phone: string;
   email: string;
-  school: string;
+  schoolId: string;
   address: string;
   cac: string;
   password: string;
@@ -29,7 +29,7 @@ const EMPTY: VendorForm = {
   vendorName: "",
   phone: "",
   email: "",
-  school: "",
+  schoolId: "",
   address: "",
   cac: "",
   password: "",
@@ -37,6 +37,7 @@ const EMPTY: VendorForm = {
 
 /** Vendor registration. */
 export default function VendorRegisterPage() {
+  const { schools, loading: schoolsLoading, error: schoolsError } = useSchools();
   const [form, setForm] = useState<VendorForm>(EMPTY);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -57,7 +58,7 @@ export default function VendorRegisterPage() {
       {
         full_name: form.vendorName,
         phone_number: form.phone,
-        school: form.school,
+        school_id: form.schoolId,
         business_name: form.businessName,
         address: form.address,
         cac_number: form.cac,
@@ -142,11 +143,13 @@ export default function VendorRegisterPage() {
 
         <SelectField
           label="School / Campus"
-          options={SCHOOLS}
+          options={schools}
           placeholder="Select campus"
           required
-          value={form.school}
-          onChange={set("school")}
+          disabled={schoolsLoading}
+          value={form.schoolId}
+          onChange={set("schoolId")}
+          error={schoolsError ?? undefined}
         />
 
         <FormField

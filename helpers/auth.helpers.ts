@@ -1,27 +1,3 @@
-// Mock data + option lists used across the auth flows.
-// Replace with Supabase-backed sources when the API layer is wired up.
-
-export const SCHOOLS: string[] = [
-  "University of Lagos (UNILAG)",
-  "University of Ibadan (UI)",
-  "Obafemi Awolowo University (OAU)",
-  "University of Nigeria, Nsukka (UNN)",
-  "Covenant University",
-  "Babcock University",
-  "Lagos State University (LASU)",
-  "Federal University of Technology, Akure (FUTA)",
-];
-
-export const HOSTELS: string[] = [
-  "Moremi Hall",
-  "Mariere Hall",
-  "Queen Amina Hall",
-  "Kofo Ademola Hall",
-  "Eni Njoku Hall",
-  "Jaja Hall",
-  "Off-campus / Private Lodge",
-];
-
 export const FOOD_CATEGORIES: string[] = [
   "Rice",
   "Fast Food",

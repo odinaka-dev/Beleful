@@ -4,9 +4,14 @@ import * as React from "react";
 import { ArrowDown2 } from "iconsax-reactjs";
 import { cn } from "@/lib/utils";
 
+export interface SelectOption {
+  value: string;
+  label: string;
+}
+
 interface SelectFieldProps extends React.ComponentProps<"select"> {
   label: string;
-  options: string[];
+  options: Array<string | SelectOption>;
   error?: string;
   placeholder?: string;
 }
@@ -58,11 +63,15 @@ export function SelectField({
           <option value="" disabled>
             {placeholder}
           </option>
-          {options.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
+          {options.map((option) => {
+            const value = typeof option === "string" ? option : option.value;
+            const label = typeof option === "string" ? option : option.label;
+            return (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            );
+          })}
         </select>
         <ArrowDown2
           size={18}

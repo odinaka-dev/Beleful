@@ -7,9 +7,9 @@ import { FormField } from "@/components/form/form-field";
 import { SelectField } from "@/components/form/select-field";
 import { FileUpload } from "@/components/form/file-upload";
 import { PrimaryButton } from "@/components/ui/primary-button";
-import { SCHOOLS, HOSTELS } from "@/helpers/auth.helpers";
 import { createClient } from "@/lib/supabase/client";
 import { uploadOwnFile } from "@/lib/storage/upload";
+import { useSchools } from "@/hooks/use-schools";
 
 type ImageStatus = "idle" | "uploading" | "saved" | "error";
 type SaveStatus = "idle" | "saving" | "saved" | "error";
@@ -18,7 +18,8 @@ interface StudentProfile {
   fullName: string;
   email: string;
   phone: string;
-  school: string;
+  schoolId: string;
+  schoolName: string;
   hostel: string;
 }
 
@@ -26,7 +27,8 @@ const EMPTY_PROFILE: StudentProfile = {
   fullName: "",
   email: "",
   phone: "",
-  school: "",
+  schoolId: "",
+  schoolName: "",
   hostel: "",
 };
 
@@ -50,8 +52,10 @@ function ProfileSkeleton() {
 
 /** Student profile: avatar, contact details, school/hostel. */
 export default function ProfilePage() {
+  const { schools, loading: schoolsLoading, error: schoolsError } = useSchools();
   const [profile, setProfile] = React.useState<StudentProfile>(EMPTY_PROFILE);
   const [originalEmail, setOriginalEmail] = React.useState("");
+  const [originalSchoolId, setOriginalSchoolId] = React.useState("");
   const [avatarUrl, setAvatarUrl] = React.useState<string | null>(null);
   const [avatarStatus, setAvatarStatus] = React.useState<ImageStatus>("idle");
   const [avatarError, setAvatarError] = React.useState<string | null>(null);
@@ -71,7 +75,7 @@ export default function ProfilePage() {
 
         const { data: prof } = await supabase
           .from("profiles")
-          .select("full_name, email, phone_number, school, hostel, avatar_url")
+          .select("full_name, email, phone_number, school_id, hostel, avatar_url, schools(name)")
           .eq("id", userData.user.id)
           .single();
 
@@ -81,10 +85,12 @@ export default function ProfilePage() {
           fullName: prof.full_name ?? "",
           email: prof.email ?? "",
           phone: prof.phone_number ?? "",
-          school: prof.school ?? "",
+          schoolId: prof.school_id ?? "",
+          schoolName: prof.schools?.name ?? "",
           hostel: prof.hostel ?? "",
         });
         setOriginalEmail(prof.email ?? "");
+        setOriginalSchoolId(prof.school_id ?? "");
         setAvatarUrl(prof.avatar_url);
       } finally {
         if (active) setLoading(false);
@@ -147,13 +153,16 @@ export default function ProfilePage() {
       return;
     }
 
+    const schoolUpdate = originalSchoolId
+      ? {}
+      : { school_id: profile.schoolId || null };
     const { error: profileError } = await supabase
       .from("profiles")
       .update({
         full_name: profile.fullName,
         phone_number: profile.phone,
-        school: profile.school,
         hostel: profile.hostel,
+        ...schoolUpdate,
       })
       .eq("id", userData.user.id);
 
@@ -161,6 +170,16 @@ export default function ProfilePage() {
       setSaveStatus("error");
       setSaveError(profileError.message);
       return;
+    }
+
+    if (!originalSchoolId && profile.schoolId) {
+      setOriginalSchoolId(profile.schoolId);
+      setProfile((current) => ({
+        ...current,
+        schoolName:
+          schools.find((school) => school.value === profile.schoolId)?.label ??
+          current.schoolName,
+      }));
     }
 
     if (profile.email && profile.email !== originalEmail) {
@@ -251,17 +270,25 @@ export default function ProfilePage() {
                 value={profile.phone}
                 onChange={set("phone")}
               />
-              <SelectField
-                label="School"
-                options={SCHOOLS}
-                value={profile.school}
-                onChange={set("school")}
-              />
-              <SelectField
+              {originalSchoolId ? (
+                <FormField label="School" value={profile.schoolName} readOnly />
+              ) : (
+                <SelectField
+                  label="School"
+                  options={schools}
+                  value={profile.schoolId}
+                  onChange={set("schoolId")}
+                  disabled={schoolsLoading}
+                  error={schoolsError ?? undefined}
+                  required
+                />
+              )}
+              <FormField
                 label="Hostel / Residence"
-                options={HOSTELS}
+                placeholder="Enter your usual residence"
                 value={profile.hostel}
                 onChange={set("hostel")}
+                maxLength={160}
               />
             </div>
           </div>
