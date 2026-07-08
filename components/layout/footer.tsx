@@ -3,68 +3,34 @@
 import { Link } from "@chakra-ui/react";
 import Image from "next/image";
 import { ArrowRight } from "iconsax-reactjs";
-import {
-  FaInstagram,
-  FaXTwitter,
-  FaLinkedinIn,
-  FaFacebookF,
-} from "react-icons/fa6";
+import { FaApple, FaGooglePlay } from "react-icons/fa";
 import { BelefulImages } from "@/constant/image";
-
-const FOOTER_LINKS = [
-  {
-    title: "Explore",
-    links: [
-      { label: "Why Beleful?", href: "/" },
-      { label: "Food Vendors", href: "/vendor" },
-      { label: "Delivery Agents", href: "/agents" },
-      { label: "How it works", href: "/" },
-      { label: "Campuses", href: "/" },
-    ],
-  },
-  {
-    title: "Company",
-    links: [
-      { label: "About us", href: "/" },
-      { label: "Careers", href: "/" },
-      { label: "Blog", href: "/" },
-      { label: "Partners", href: "/" },
-      { label: "Contact us", href: "/contact-us" },
-    ],
-  },
-];
-
-const SOCIAL_LINKS = [
-  { label: "LinkedIn", href: "#", icon: FaLinkedinIn },
-  { label: "Twitter", href: "#", icon: FaXTwitter },
-  { label: "Facebook", href: "#", icon: FaFacebookF },
-  { label: "Instagram", href: "#", icon: FaInstagram },
-];
-
-const LEGAL_LINKS = [
-  { label: "Support", href: "/" },
-  { label: "Privacy Policy", href: "/" },
-  { label: "Terms of Use", href: "/" },
-  { label: "Cookie Policy", href: "/" },
-];
+import SubFooterComponent from "./sub-footer";
+import PromoPackComponent from "./promo-pack";
+import {
+  FOOTER_LINKS,
+  LEGAL_LINKS,
+  SOCIAL_LINKS,
+} from "@/helpers/website.helpers";
 
 export default function FooterComponent() {
   return (
-    <footer className="bg-heading-color">
-      <div className="mx-auto mt-12 max-w-[96%] xl:max-w-[1200px]">
-        <div className="relative overflow-hidden text-white rounded-3xl">
-          {/* Top: links + CTA */}
-          <div className="grid grid-cols-1 lg:grid-cols-2">
-            {/* Left — brand + link columns */}
+    <footer className="pt-16 bg-heading-color">
+      <PromoPackComponent />
+      <SubFooterComponent />
+      <div className="mx-auto mt-12 max-w-[96%] xl:max-w-[1400px]">
+        <div className="relative pb-20 overflow-hidden text-white rounded-3xl sm:pb-28 lg:pb-36">
+          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2">
             <div className="px-8 py-12 border-b border-white/10 md:px-12 lg:border-b-0 lg:border-r">
-              {/* Brand */}
               <div className="flex flex-col gap-6 md:items-start md:justify-between">
-                <span className="text-3xl font-bold tracking-tight text-white font-heading">
-                  Beleful
-                </span>
+                <Image
+                  src={BelefulImages.logoImage}
+                  alt="grideats_logo"
+                  className="w-32 h-auto"
+                />
                 <p className="max-w-[16rem] text-sm leading-relaxed text-white/60">
                   Because satisfaction that meets luxurious expectations should
-                  never be more than a few taps away.
+                  never be more than a few steps away.
                 </p>
               </div>
 
@@ -122,43 +88,54 @@ export default function FooterComponent() {
               <p className="text-sm font-bold uppercase tracking-[0.2em] text-red-variant">
                 Get Started
               </p>
-              <h2 className="mt-4 max-w-[14ch] font-heading text-5xl font-bold leading-[1.05] text-white md:text-6xl">
-                Get the Beleful app
+              <h2 className="mt-4 max-w-[18ch] font-heading text-3xl font-bold leading-tight text-white md:text-4xl">
+                Get the Grid Eats app now on app store or play store
               </h2>
+
+              {/* App download buttons */}
+              <div className="flex flex-wrap gap-4 mt-8">
+                <Link
+                  href="#"
+                  className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-white transition-colors bg-red-variant rounded-xl hover:bg-red-variant/85"
+                >
+                  <FaGooglePlay className="text-lg shrink-0" />
+                  Download on googleplay
+                </Link>
+                <Link
+                  href="#"
+                  className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-white transition-colors bg-red-variant rounded-xl hover:bg-red-variant/85"
+                >
+                  <FaApple className="text-lg shrink-0" />
+                  Download on Appstore
+                </Link>
+              </div>
 
               {/* Email signup pill */}
               <form
                 onSubmit={(e) => e.preventDefault()}
-                className="flex items-center justify-between max-w-md gap-2 p-2 pl-6 mt-10 bg-white rounded-full"
+                className="flex items-center justify-between max-w-md gap-2 p-2 pl-6 mt-8 bg-white rounded-full"
               >
                 <input
                   type="email"
                   required
-                  placeholder="Enter your email..."
+                  placeholder="Enter your email Address"
                   className="w-full text-sm bg-transparent outline-none text-ash-variant placeholder:text-ash-variant/50"
                 />
                 <button
                   type="submit"
                   aria-label="Submit email"
-                  className="flex items-center justify-center w-12 h-12 text-white transition-transform rounded-full shrink-0 bg-red-variant hover:scale-105"
+                  className="flex items-center justify-center w-10 h-10 text-white transition-transform rounded-full shrink-0 bg-red-variant hover:scale-105"
                 >
-                  <ArrowRight size={22} color="#ffffff" />
+                  <ArrowRight size={20} color="#ffffff" />
                 </button>
               </form>
-
-              {/* Food illustration */}
-              <Image
-                src={BelefulImages.FoodBottle}
-                alt="Beleful food"
-                className="absolute hidden object-contain pointer-events-none select-none -bottom-2 right-4 w-44 md:block lg:w-56"
-              />
             </div>
           </div>
 
           {/* Bottom bar */}
-          <div className="flex flex-col items-center gap-4 px-8 py-6 text-sm border-t border-white/10 text-white/60 md:flex-row md:justify-between md:px-12">
+          <div className="relative z-10 flex flex-col items-center gap-4 px-8 py-6 text-sm border-t border-white/10 text-white/60 md:flex-row md:justify-between md:px-12">
             <p>
-              © {new Date().getFullYear()} Beleful Inc. All rights reserved.
+              © {new Date().getFullYear()} GridEats Inc. All rights reserved.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
               {LEGAL_LINKS.map((item) => (
@@ -173,6 +150,14 @@ export default function FooterComponent() {
               ))}
             </div>
           </div>
+
+          {/* Oversized brand watermark */}
+          <span
+            aria-hidden="true"
+            className="pointer-events-none select-none absolute -bottom-[0.18em] left-1/2 -translate-x-1/2 w-full text-center font-heading font-extrabold leading-none text-transparent bg-gradient-to-b from-red-variant to-red-variant/10 bg-clip-text text-[22vw] lg:text-[18vw]"
+          >
+            GridEats
+          </span>
         </div>
       </div>
     </footer>

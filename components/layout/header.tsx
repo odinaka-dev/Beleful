@@ -43,7 +43,7 @@ export default function HeaderComponent() {
                 key={index}
                 className="
                   group relative overflow-hidden rounded-full
-                  px-6 py-3 text-sm font-semibold text-[#00452E]
+                  px-6 py-3 text-sm font-semibold text-[#111111]
                   transition-all duration-300 ease-in-out
                   hover:text-white
                 "
@@ -55,7 +55,7 @@ export default function HeaderComponent() {
                 <span
                   className="
                     absolute inset-0 z-0 scale-0 rounded-full
-                    bg-[#00452E]
+                    bg-[#FF771F]
                     transition-transform duration-300 ease-in-out
                     group-hover:scale-100
                   "
@@ -75,7 +75,7 @@ export default function HeaderComponent() {
             padding={6}
             buttonName="Login"
             buttonNameSec="Register"
-            bgColor="#016644"
+            bgColor="#FF771F"
             textColor="#ffffff"
             linkOne="/login"
             linkTwo="/register"
@@ -126,7 +126,7 @@ export default function HeaderComponent() {
               padding={6}
               buttonName="Login"
               buttonNameSec="Register"
-              bgColor="#016644"
+              bgColor="#FF771F"
               textColor="#ffffff"
               linkOne="/login"
               linkTwo="/register"

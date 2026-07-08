@@ -30,11 +30,11 @@ export default function DoubleButton({
           bg={bgColor}
           color={textColor}
           p={padding}
-          rounded={"2xl"}
+          rounded={"full"}
           cursor={"pointer"}
           transition={"all 0.3s ease"}
           _hover={{
-            bg: "#016644",
+            bg: "#FF771F",
             transform: "translateY(-3px)",
             boxShadow: "0 10px 20px rgba(0,0,0,0.15)",
           }}
@@ -49,14 +49,14 @@ export default function DoubleButton({
       {/* Secondary Button */}
       <Link href={linkTwo}>
         <Button
-          border={`3px solid ${bgColor}`}
+          border={`1px solid ${bgColor}`}
           bg={"transparent"}
           color={bgColor}
           p={padding}
-          rounded={"2xl"}
+          rounded={"full"}
           transition={"all 0.3s ease"}
           _hover={{
-            bg: "#00452E",
+            bg: "#FF771F",
             color: "white",
             transform: "translateY(-3px)",
             boxShadow: "0 10px 20px rgba(0,0,0,0.15)",

@@ -1,56 +1,75 @@
 "use client";
 
+import { Box, InputGroup, Input } from "@chakra-ui/react";
+import { Location } from "iconsax-reactjs";
+
 import AvailableVendorComponent from "@/components/layout/available-vendor";
 import CreateBannerComponent from "@/components/layout/create-banner";
 import FrequentlyComponent from "@/components/layout/frequently-asked-questions";
 import HeaderComponent from "@/components/layout/header";
-import SubFooterComponent from "@/components/layout/sub-footer";
-import WhatWeAreComponent from "@/components/layout/what-we-are";
+import JoinOurNetwork from "@/components/layout/join-our-network";
 import DoubleButton from "@/components/ui/Button";
 import { BelefulImages } from "@/constant/image";
-
-import Image from "next/image";
+import WhatWeAreComponent from "@/components/layout/what-we-are";
 
 export default function Homepage() {
   return (
     <div>
-      <main className="flex flex-col items-center justify-between h-screen overflow-clip bg-banner-bg">
-        <div className="w-full max-w-[96%] xl:max-w-[1200px] mx-auto">
+      <main
+        className="relative flex flex-col items-center justify-between h-screen bg-center bg-no-repeat bg-cover overflow-clip"
+        style={{ backgroundImage: `url(${BelefulImages.HomeBanner.src})` }}
+      >
+        {/* dark overlay over the background image */}
+        {/* <div className="absolute inset-0 bg-black/40" aria-hidden="true" /> */}
+
+        <div className="relative z-10 w-full max-w-[96%] xl:max-w-[1200px] mx-auto">
           <HeaderComponent />
         </div>
-        <div className="w-full max-w-[96%] xl:max-w-[1200px] mx-auto">
-          <h1 className="w-full mt-10 text-5xl font-extrabold text-center sm:text-6xl md:text-6xl xl:text-8xl">
-            Ready To Satisfy Your <br />{" "}
-            <span className="relative p-1 font-extrabold bg-sub-heading-color rounded-xl top-4">
-              Cravings
-            </span>
+        <div className="relative z-10 w-full max-w-[96%] xl:max-w-[1200px] mx-auto h-screen flex items-center flex-col gap-12">
+          <h1 className="w-full mt-10 text-5xl font-extrabold text-center sm:text-7xl">
+            Ready To Satisfy Your Cravings
           </h1>
-          <DoubleButton
-            className="mt-20 flex flex-col sm:flex-row w-full items-center justify-center gap-4 text-[18px] md:text-[24px] font-semibold max-w-[80%] xl:max-w-[1200px] mx-auto"
-            buttonName="Quick Order"
-            buttonNameSec="Get Started"
-            padding={8}
-            bgColor="#016644"
-            textColor="#ffffff"
-            linkOne="/login"
-            linkTwo="/register"
-          />
-        </div>
-        <div className="w-full">
-          <Image
-            src={BelefulImages.homepageBanner}
-            alt="Homepage-banner-image"
-            loading="eager"
-            className="relative w-screen -bottom-12"
-          />
+          {/* input group */}
+          <Box
+            bg="white"
+            rounded="full"
+            p={2}
+            px={4}
+            mt={2}
+            className="items-center hidden gap-6 sm:flex"
+          >
+            <InputGroup startElement={<Location color={"#111111"} />}>
+              <Input
+                type="search"
+                placeholder="Enter university name or location"
+                width={{ base: 100, md: 280 }}
+                focusRing="none"
+                _focus={{
+                  boxShadow: "none",
+                  outline: "none",
+                  borderColor: "inherit",
+                }}
+              />
+            </InputGroup>
+            <DoubleButton
+              className="flex items-center justify-center gap-3 font-medium"
+              padding={6}
+              buttonName="Order Now"
+              buttonNameSec="Download App"
+              bgColor="#FF771F"
+              textColor="#ffffff"
+              linkOne="/login"
+              linkTwo="/register"
+            />
+          </Box>
         </div>
       </main>
 
       <WhatWeAreComponent />
+      <JoinOurNetwork />
       <CreateBannerComponent />
       <AvailableVendorComponent />
       <FrequentlyComponent />
-      <SubFooterComponent />
     </div>
   );
 }
