@@ -1,4 +1,10 @@
 import { BelefulImages } from "@/constant/image";
+import {
+  FaInstagram,
+  FaXTwitter,
+  FaLinkedinIn,
+  FaFacebookF,
+} from "react-icons/fa6";
 
 export const HEADERLINKS = [
   {
@@ -19,30 +25,57 @@ export const HEADERLINKS = [
   },
 ];
 
+// export const WHATWEARECARD = [
+//   {
+//     id: "1",
+//     title: "E-Food Marketplace",
+//     description:
+//       "BELEFUL connects students to nearby  already known campus food vendors to get already known foods at affordable price from already known campus vendors.",
+//     image: BelefulImages.CardImageone,
+//     bghexCode: "#B04D0F",
+//   },
+//   {
+//     id: "2",
+//     title: "Food Vendors",
+//     description:
+//       "BELEFUL connects vendors a digital space to reach out to more places across campus grounds and more students, with minimal marketing and scaling profits.  ",
+//     image: BelefulImages.CardImageTwo,
+//     bghexCode: "#00452E",
+//   },
+//   {
+//     id: "3",
+//     title: "Fast Delivery",
+//     description:
+//       "BELEFUL creates opportunity for students to earn as one of it’s delivery agents. students signs up and can deliver on the go anywhere anytime around school campus while they earn.",
+//     image: BelefulImages.CardImageThree,
+//     bghexCode: "#2e2e2e",
+//   },
+// ];
+
 export const WHATWEARECARD = [
   {
     id: "1",
-    title: "E-Food Marketplace",
+    title: "Start selling",
     description:
-      "BELEFUL connects students to nearby  already known campus food vendors to get already known foods at affordable price from already known campus vendors.",
-    image: BelefulImages.CardImageone,
-    bghexCode: "#B04D0F",
+      "Do you a canteen, food store or a cafe on campus. Sign up on beleful app today to reach more customers and places across campus grounds, with minimal marking and start scaling your profit and awareness across campus today.",
+    image: BelefulImages.StartSelling,
+    bghexCode: "#8CFFC5",
   },
   {
     id: "2",
-    title: "Food Vendors",
+    title: "Start delivering",
     description:
-      "BELEFUL connects vendors a digital space to reach out to more places across campus grounds and more students, with minimal marketing and scaling profits.  ",
-    image: BelefulImages.CardImageTwo,
-    bghexCode: "#00452E",
+      "Grid eats creates opportunity for students to earn as one of it’s delivery agents. students signs up and can deliver on the go anywhere anytime around school campus while they earn.",
+    image: BelefulImages.StartDelivering,
+    bghexCode: "#9ED7FF",
   },
   {
     id: "3",
-    title: "Fast Delivery",
+    title: "Behind the scene",
     description:
       "BELEFUL creates opportunity for students to earn as one of it’s delivery agents. students signs up and can deliver on the go anywhere anytime around school campus while they earn.",
-    image: BelefulImages.CardImageThree,
-    bghexCode: "#2e2e2e",
+    image: BelefulImages.OrderingImage,
+    bghexCode: "#FFFF82",
   },
 ];
 
@@ -57,14 +90,14 @@ export const USER_SIGNUP_STEPS = [
   {
     step: 2,
     title: "Verify Your Identity",
-    image: BelefulImages.PhoneImage,
+    image: BelefulImages.StepTwoImage,
     description:
       "Confirm your account with an OTP sent to your phone or email to ensure secure access.",
   },
   {
     step: 3,
     title: "Start Ordering Food",
-    image: BelefulImages.PhoneImage,
+    image: BelefulImages.StepThreeImage,
     description:
       "Explore nearby campus vendors, add meals to your cart, and place your first order in seconds.",
   },
@@ -147,8 +180,9 @@ export const FOODVENDORDATA = [
     title: "Gain more Visibility",
     description:
       "Gain more visibility on BELEFUL. Reach out to more students across numerous faculty.",
-    hexCode: "#00452E",
-    textHexCode: "#ffffff",
+    hexCode: "#FFCB53",
+    textHexCode: "#111111",
+    borderhexCode: "#DB9A04",
     image: BelefulImages.GainMoreVisibility,
   },
   {
@@ -156,8 +190,9 @@ export const FOODVENDORDATA = [
     title: "Connect with more Customers",
     description:
       "Create an online presence and connection with your customers.",
-    hexCode: "#B04D0F",
-    textHexCode: "#ffffff",
+    hexCode: "#FF5641",
+    textHexCode: "#111111",
+    borderhexCode: "#B91D0A",
     image: BelefulImages.CardImageone,
   },
   {
@@ -165,8 +200,9 @@ export const FOODVENDORDATA = [
     title: "Generate more Sales",
     description:
       "In addition to your Daily Income, generate more income and sales with wider reach across campus.",
-    hexCode: "#2e2e2e",
-    textHexCode: "#ffffff",
+    hexCode: "#2DC83D",
+    textHexCode: "#111111",
+    borderhexCode: "#028810",
     image: BelefulImages.CardImageTwo,
   },
   {
@@ -174,8 +210,47 @@ export const FOODVENDORDATA = [
     title: "Easy payouts withdrawal",
     description:
       "Earn more, Track your payouts, and  process withdrawal easily, no Debt issue, no student wahala.",
-    hexCode: "#FFFFDE",
-    textHexCode: "#2e2e2e",
+    hexCode: "#FE78E8",
+    textHexCode: "#111111",
+    borderhexCode: "#98007F",
     image: BelefulImages.EasyPayout,
   },
+];
+
+// footer helpers
+export const FOOTER_LINKS = [
+  {
+    title: "Explore",
+    links: [
+      { label: "Why Beleful?", href: "/" },
+      { label: "Food Vendors", href: "/vendor" },
+      { label: "Delivery Agents", href: "/agents" },
+      { label: "How it works", href: "/" },
+      { label: "Campuses", href: "/" },
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      { label: "About us", href: "/" },
+      { label: "Careers", href: "/" },
+      { label: "Blog", href: "/" },
+      { label: "Partners", href: "/" },
+      { label: "Contact us", href: "/contact-us" },
+    ],
+  },
+];
+
+export const SOCIAL_LINKS = [
+  { label: "LinkedIn", href: "#", icon: FaLinkedinIn },
+  { label: "Twitter", href: "#", icon: FaXTwitter },
+  { label: "Facebook", href: "#", icon: FaFacebookF },
+  { label: "Instagram", href: "#", icon: FaInstagram },
+];
+
+export const LEGAL_LINKS = [
+  { label: "Support", href: "/" },
+  { label: "Privacy Policy", href: "/" },
+  { label: "Terms of Use", href: "/" },
+  { label: "Cookie Policy", href: "/" },
 ];
