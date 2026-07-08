@@ -2,6 +2,8 @@
 
 import { Box, Stack } from "@chakra-ui/react";
 import Heading from "../ui/Heading";
+import { BelefulImages } from "@/constant/image";
+import Image from "next/image";
 
 export default function WhatWeAreComponent() {
   return (
@@ -12,8 +14,15 @@ export default function WhatWeAreComponent() {
         description="GRID EATS connects students to nearby campus food vendors while enabling fellow students earn money by delivering meals across campus in minutes."
       />
 
-      <Box className="mt-6">
-        <Stack direction={{ base: "column", md: "row" }}></Stack>
+      <Box className="mt-12">
+        <Stack direction={{ base: "column" }} alignItems={"center"} w="full">
+          <Image
+            src={BelefulImages.PhoneFrame}
+            alt=""
+            loading="eager"
+            className=""
+          />
+        </Stack>
       </Box>
     </div>
   );
