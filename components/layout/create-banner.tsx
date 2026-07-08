@@ -32,12 +32,12 @@ function StarRating({ rating }: { rating: number }) {
 
 export default function CreateBannerComponent() {
   return (
-    <div className="py-24 bg-banner-bg">
+    <div className="py-24 bg-[#FFEBDE]">
       <div className="mx-auto max-w-[90%] lg:my-0 xl:max-w-[1200px]">
         {/* Heading */}
         <Heading
           className="max-w-[90%] lg:max-w-[960px] mx-auto"
-          title="Beleful has every student covered."
+          title="GRID EATS has every student covered."
           description="What do you need? A quick fix after a stressful lecture? A quick dinner before study time? Download BELEFUL and let’s deliver satisfaction that assists learning."
         />
 
@@ -55,17 +55,17 @@ export default function CreateBannerComponent() {
                 <div className="max-w-[800px] mx-auto flex flex-col items-center justify-between lg:flex-row">
                   <Box className="flex-1">
                     <Badge
-                      bg="#00452E"
-                      color="white"
-                      p={8}
-                      py={8}
+                      bg="#FF771F"
+                      color="#111111"
+                      p={{ base: 6, md: 6, lg: 8 }}
+                      py={{ base: 5, md: 6, lg: 8 }}
                       rounded="full"
-                      fontSize={"36px"}
+                      fontSize={{ base: "24px", md: "36px" }}
                     >
                       {items.step}
                     </Badge>
 
-                    <h1 className="mt-4 text-[36px] font-primary font-bold text-[#00452E] lg:text-3xl">
+                    <h1 className="mt-4 text-[36px] font-primary font-bold text-[#FF771F] lg:text-3xl">
                       {items.title}
                     </h1>
 
@@ -109,7 +109,7 @@ export default function CreateBannerComponent() {
               breakpoints={{
                 0: { slidesPerView: 1 },
                 768: { slidesPerView: 2 },
-                1024: { slidesPerView: 3 },
+                1024: { slidesPerView: 2 },
               }}
               className="!pb-14"
             >
@@ -120,7 +120,7 @@ export default function CreateBannerComponent() {
 
                 return (
                   <SwiperSlide key={index} className="!h-auto">
-                    <div className="flex h-full flex-col gap-5 rounded-2xl bg-white p-6 shadow-sm sm:p-7">
+                    <div className="flex flex-col h-full gap-5 p-6 bg-white shadow-sm rounded-2xl sm:p-7">
                       <StarRating rating={item.rating} />
 
                       <p className="flex-1 text-[15px] leading-relaxed text-sub-text-color sm:text-base">
@@ -132,19 +132,19 @@ export default function CreateBannerComponent() {
                           <Image
                             src={image}
                             alt={item.name}
-                            className="size-12 shrink-0 rounded-full object-cover"
+                            className="object-cover rounded-full size-12 shrink-0"
                           />
                         ) : (
-                          <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#00452E] text-lg font-bold uppercase text-white">
+                          <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#FF771F] text-lg font-bold uppercase text-white">
                             {item.name.charAt(0)}
                           </span>
                         )}
 
                         <div className="min-w-0">
-                          <h3 className="truncate font-semibold text-[#1E1E1E]">
+                          <h3 className="truncate font-semibold text-[#111111]">
                             {item.name}
                           </h3>
-                          <p className="truncate text-sm text-sub-text-color">
+                          <p className="text-sm truncate text-sub-text-color">
                             {item.role} · {item.school}
                           </p>
                         </div>

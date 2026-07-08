@@ -12,12 +12,12 @@ export default function SubFooterComponent() {
   };
 
   return (
-    <div className="bg-green-variant max-w-[96%] xl:max-w-[1200px] mx-auto rounded-3xl mt-12">
+    <div className="bg-gradient-to-br from-[#E67E30] to-[#CB671D] max-w-[90%] xl:max-w-[1200px] mx-auto rounded-3xl mt-12">
       <div className="flex flex-col-reverse items-center justify-between px-8 py-8 lg:py-0 md:px-12 lg:flex-row">
         <Box className="flex-1">
           <SplitText
-            text="Check If Beleful is Available in your campus."
-            className="text-white text-center sm:text-left font-bold text-[36px] sm:text-[48px] md:text-[60px]"
+            text="Check If GRID EATS is Available in your campus."
+            className="text-white text-center sm:text-left font-bold text-[36px] sm:text-[48px] md:text-[56px]"
             delay={2}
             duration={1.25}
             ease="power3.out"
@@ -33,7 +33,7 @@ export default function SubFooterComponent() {
           <div className="flex items-center justify-between gap-4 p-2 bg-white rounded-full mt-7 search_input">
             <InputGroup startElement={<SearchFavorite />}>
               <Input
-                placeholder="Search your vendor"
+                placeholder="Search your university"
                 border={"none"}
                 _focus={{
                   border: "none",
@@ -52,20 +52,24 @@ export default function SubFooterComponent() {
               />
             </InputGroup>
             <Button
-              bg={"#00452e"}
+              bg={"#FF771F"}
               color={"white"}
               p={2}
               px={9}
               rounded={"full"}
               fontWeight={"medium"}
-              className=""
+              _hover={{ bg: "#E86A15" }}
             >
               Search
             </Button>
           </div>
         </Box>
-        <div className="">
-          <Image src={BelefulImages.Burger} alt="" className="" />
+        <div className="relative -top-24">
+          <Image
+            src={BelefulImages.Burger}
+            alt="Delicious burger"
+            className=""
+          />
         </div>
       </div>
     </div>

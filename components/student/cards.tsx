@@ -16,6 +16,7 @@ import {
 } from "@/helpers/student.helpers";
 import { useCart } from "@/provider/cart-provider";
 import { toaster } from "../ui/toaster";
+import Image from "next/image";
 
 /** Category pill card used in the dashboard category strip. */
 export function CategoryCard({ category }: { category: Category }) {
@@ -26,7 +27,7 @@ export function CategoryCard({ category }: { category: Category }) {
       className="flex flex-col items-center gap-2 group"
     >
       {category.image ? (
-        <img
+        <Image
           src={category.image}
           alt={category.name}
           className="object-cover w-16 h-16 transition-transform shadow-sm rounded-3xl group-hover:-translate-y-1 sm:h-20 sm:w-20"
@@ -55,7 +56,7 @@ export function VendorCard({ vendor }: { vendor: Vendor }) {
     >
       <div className="relative">
         {vendor.bannerImage ? (
-          <img
+          <Image
             src={vendor.bannerImage}
             alt={vendor.name}
             className="object-cover w-full h-32"
@@ -151,7 +152,7 @@ export function FoodCard({ food }: { food: Food }) {
         className="relative block"
       >
         {food.imageUrl ? (
-          <img
+          <Image
             src={food.imageUrl}
             alt={food.name}
             className="object-cover w-full h-32"
