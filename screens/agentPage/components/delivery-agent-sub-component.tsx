@@ -1,8 +1,6 @@
 "use client";
 
 import Heading from "@/components/ui/Heading";
-import { BelefulImages } from "@/constant/image";
-import Image from "next/image";
 import FrequentlyComponent from "@/components/layout/frequently-asked-questions";
 import { BENEFITS, STEPS } from "@/helpers/agent.helpers";
 
@@ -15,16 +13,6 @@ export default function DeliveryAgentSubComponent() {
         title="Student Struggles"
         description="We understand the struggle of every student, keeping up with cash just enough to fund day to day campus expenses. On Beleful, you can earn whenever and wherever on campus."
       />
-
-      <div className="justify-center hidden mt-14 lg:mt-20">
-        <Image
-          src={BelefulImages.EarnImage}
-          alt="Student earning by delivering on Beleful"
-          loading="eager"
-          unoptimized
-          className="h-auto w-full max-w-[563px]"
-        />
-      </div>
 
       {/* Benefits */}
       <div className="mt-24 lg:mt-32">
