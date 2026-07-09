@@ -13,6 +13,7 @@ import TestimonialImage from "@/public/asset/images/testimonial-image.png";
 import MapImage from "@/public/asset/images/map.svg";
 import FoodBottle from "@/public/asset/images/food-bottle.png";
 import HomeBanner from "@/public/asset/images/home-banner.png";
+import schoolImage from "@/public/asset/images/homepage-banner-image.png";
 import OrderingImage from "@/public/asset/images/ordering.png";
 import StartDelivering from "@/public/asset/images/start-delivering.png";
 import StartSelling from "@/public/asset/images/start-selling.png";
@@ -26,11 +27,18 @@ import convenant from "@/public/asset/images/convenant.svg";
 import lasustech from "@/public/asset/images/lasustech.svg";
 import yabatech from "@/public/asset/images/yabatech.svg";
 import caleb from "@/public/asset/images/caleb.svg";
+import bannerBackground from "@/public/asset/images/banner-background.svg";
 
 // IMPORTS FOR FOOD VENDORS PAGE
 import FoodVendor from "@/public/asset/images/food-vendor.svg";
 import GainMoreVisibility from "@/public/asset/images/card-1.svg";
 import EasyPayout from "@/public/asset/images/card-4.svg";
+import deliveryBackground from "@/public/asset/images/delivery-background.svg";
+import deliveryAgent from "@/public/asset/images/delivery-agent.svg";
+import earnDrop from "@/public/asset/images/agent-1.svg";
+import stayCampus from "@/public/asset/images/agent-2.svg";
+import buildReputation from "@/public/asset/images/agent-3.svg";
+import flexibleHours from "@/public/asset/images/agent-4.png";
 
 interface Image {
   Burger: StaticImageData;
@@ -58,11 +66,19 @@ interface Image {
   lasustech: StaticImageData;
   yabatech: StaticImageData;
   caleb: StaticImageData;
+  bannerBackground: StaticImageData;
+  schoolImage: StaticImageData;
 
   // FOOD VENDORS STATIC IMAGE IMPORTS
   FoodVendor: StaticImageData;
   GainMoreVisibility: StaticImageData;
   EasyPayout: StaticImageData;
+  deliveryBackground: StaticImageData;
+  deliveryAgent: StaticImageData;
+  earnDrop: StaticImageData;
+  stayCampus: StaticImageData;
+  buildReputation: StaticImageData;
+  flexibleHours: StaticImageData;
 }
 
 export const BelefulImages: Image = {
@@ -91,9 +107,17 @@ export const BelefulImages: Image = {
   lasustech,
   yabatech,
   caleb,
+  bannerBackground,
+  schoolImage,
 
   // FOOD VENDORS IMAGES
   FoodVendor,
   GainMoreVisibility,
   EasyPayout,
+  deliveryBackground,
+  deliveryAgent,
+  earnDrop,
+  stayCampus,
+  buildReputation,
+  flexibleHours,
 };
