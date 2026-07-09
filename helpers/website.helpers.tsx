@@ -179,7 +179,7 @@ export const FOODVENDORDATA = [
     id: "1",
     title: "Gain more Visibility",
     description:
-      "Gain more visibility on BELEFUL. Reach out to more students across numerous faculty.",
+      "Gain more visibility on GRIDEATS. Reach out to more students across numerous faculty.",
     hexCode: "#FFCB53",
     textHexCode: "#111111",
     borderhexCode: "#DB9A04",
