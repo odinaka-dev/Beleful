@@ -33,8 +33,8 @@ export default function BelefulOrdersComponents() {
     <section className="pt-24">
       <Heading
         className="max-w-[96%] lg:max-w-[960px] xl:max-w-[1200px] mx-auto"
-        title="Beleful Offers"
-        description="BELEFUL offers a variety of features that support food business growth on campus, features like:"
+        title="Grid Eats Offers"
+        description="GRIDEATS offers a variety of features that support food business growth on campus, features like:"
       />
 
       <div className="max-w-[96%] lg:max-w-[960px] xl:max-w-[1400px] mx-auto mt-12">
@@ -47,7 +47,7 @@ export default function BelefulOrdersComponents() {
           {FOODVENDORDATA.map((item) => (
             <article
               key={item.id}
-              className={`group relative border-2 flex min-h-[440px] w-[85vw] shrink-0 flex-col overflow-hidden rounded-[32px] p-8 sm:w-[70vw] lg:w-[46vw] lg:p-12 xl:w-[40vw]`}
+              className={`group relative border-2 flex min-h-[440px] w-full md:w-full shrink-0 flex-col overflow-hidden rounded-[32px] p-8 lg:p-12`}
               style={{
                 borderColor: item.borderhexCode,
                 backgroundColor: item.hexCode,
@@ -59,7 +59,7 @@ export default function BelefulOrdersComponents() {
                   {item.title}
                 </h3>
 
-                <p className="text-lg leading-relaxed opacity-90 lg:text-xl">
+                <p className="text-[20px] leading-relaxed opacity-90 lg:text-[20px]">
                   {item.description}
                 </p>
               </div>
