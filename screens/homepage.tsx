@@ -11,23 +11,24 @@ import JoinOurNetwork from "@/components/layout/join-our-network";
 import DoubleButton from "@/components/ui/Button";
 import { BelefulImages } from "@/constant/image";
 import WhatWeAreComponent from "@/components/layout/what-we-are";
+import Image from "next/image";
 
 export default function Homepage() {
   return (
     <div>
       <main
         className="relative flex flex-col items-center justify-between h-screen bg-center bg-no-repeat bg-cover overflow-clip"
-        style={{ backgroundImage: `url(${BelefulImages.HomeBanner.src})` }}
+        style={{
+          backgroundImage: `url(${BelefulImages.bannerBackground.src})`,
+        }}
       >
-        {/* dark overlay over the background image */}
         {/* <div className="absolute inset-0 bg-black/40" aria-hidden="true" /> */}
-
-        <div className="relative z-10 w-full max-w-[96%] xl:max-w-[1200px] mx-auto">
+        <div className="relative z-100 w-full max-w-[96%] xl:max-w-[1200px] mx-auto">
           <HeaderComponent />
         </div>
-        <div className="relative z-10 w-full max-w-[96%] xl:max-w-[1200px] mx-auto h-screen flex items-center flex-col gap-12">
+        <div className="relative w-full max-w-[96%] xl:max-w-[1200px] mx-auto h-screen flex items-center flex-col gap-12">
           <h1 className="w-full mt-10 text-5xl font-extrabold text-center sm:text-7xl">
-            Ready To Satisfy Your Cravings
+            Ready To Satisfy <br className="block sm:hidden" /> Your Cravings
           </h1>
           {/* input group */}
           <Box
@@ -36,7 +37,7 @@ export default function Homepage() {
             p={2}
             px={4}
             mt={2}
-            className="items-center hidden gap-6 sm:flex"
+            className="items-center hidden gap-6 sm:flex "
           >
             <InputGroup startElement={<Location color={"#111111"} />}>
               <Input
@@ -62,6 +63,24 @@ export default function Homepage() {
               linkTwo="/register"
             />
           </Box>
+          <DoubleButton
+            className="mt-10 flex sm:hidden flex-col sm:flex-row w-full items-center justify-center gap-4 text-[18px] md:text-[24px] font-semibold max-w-[80%] xl:max-w-[1200px] mx-auto"
+            buttonName="Order Now"
+            buttonNameSec="Download App"
+            padding={8}
+            bgColor="#FF771F"
+            textColor="#ffffff"
+            linkOne="/vendor/register"
+            linkTwo="/vendor/login"
+          />
+        </div>
+        <div className="w-full">
+          <Image
+            src={BelefulImages.schoolImage}
+            alt="Homepage-banner-image"
+            loading="eager"
+            className="relative bottom-0 w-screen"
+          />
         </div>
       </main>
 

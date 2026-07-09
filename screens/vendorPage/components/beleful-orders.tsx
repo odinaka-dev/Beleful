@@ -37,45 +37,44 @@ export default function BelefulOrdersComponents() {
         description="BELEFUL offers a variety of features that support food business growth on campus, features like:"
       />
 
-      <div ref={targetRef} className="relative h-[280vh]">
-        <div className="sticky top-0 flex items-center pt-12 mt-12 overflow-hidden">
-          <motion.div
+      <div className="max-w-[96%] lg:max-w-[960px] xl:max-w-[1400px] mx-auto mt-12">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+          {/* <motion.div
             ref={trackRef}
             style={{ x }}
             className="flex gap-6 px-[4vw] lg:gap-8"
-          >
-            {FOODVENDORDATA.map((item) => (
-              <article
-                key={item.id}
-                className={`group relative border-2 flex min-h-[440px] w-[85vw] shrink-0 flex-col overflow-hidden rounded-[32px] p-8 sm:w-[70vw] lg:w-[46vw] lg:p-12 xl:w-[40vw]`}
-                style={{
-                  borderColor: item.borderhexCode,
-                  backgroundColor: item.hexCode,
-                  color: item.textHexCode,
-                }}
-              >
-                <div className="relative z-10 lg:max-w-[70%]">
-                  <h3 className="mb-4 text-2xl font-bold leading-tight lg:text-4xl">
-                    {item.title}
-                  </h3>
+          > */}
+          {FOODVENDORDATA.map((item) => (
+            <article
+              key={item.id}
+              className={`group relative border-2 flex min-h-[440px] w-[85vw] shrink-0 flex-col overflow-hidden rounded-[32px] p-8 sm:w-[70vw] lg:w-[46vw] lg:p-12 xl:w-[40vw]`}
+              style={{
+                borderColor: item.borderhexCode,
+                backgroundColor: item.hexCode,
+                color: item.textHexCode,
+              }}
+            >
+              <div className="relative z-10 lg:max-w-[70%]">
+                <h3 className="mb-4 text-2xl font-bold leading-tight lg:text-4xl">
+                  {item.title}
+                </h3>
 
-                  <p className="text-lg leading-relaxed opacity-90 lg:text-xl">
-                    {item.description}
-                  </p>
-                </div>
+                <p className="text-lg leading-relaxed opacity-90 lg:text-xl">
+                  {item.description}
+                </p>
+              </div>
 
-                <div className="pointer-events-none absolute bottom-0 right-0 w-[65%] translate-y-2 transition-transform duration-500 group-hover:translate-y-0 lg:w-[42%]">
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    width={400}
-                    height={300}
-                    className="object-contain w-full h-auto"
-                  />
-                </div>
-              </article>
-            ))}
-          </motion.div>
+              <div className="pointer-events-none absolute bottom-0 right-0 w-[65%] translate-y-2 transition-transform duration-500 group-hover:translate-y-0 lg:w-[42%]">
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  width={400}
+                  height={300}
+                  className="object-contain w-full h-auto"
+                />
+              </div>
+            </article>
+          ))}
         </div>
       </div>
     </section>

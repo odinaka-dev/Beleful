@@ -18,7 +18,7 @@ export default function Heading({
       </h1>
       <Text
         color={"#2e2e2e"}
-        className="mt-4 font-medium text-center line-clamp-3 leading-8 text-[18px] sm:text-[24px]"
+        className="mt-4 font-medium text-center line-clamp-3 leading-8 text-[18px] sm:text-[20px] max-w-full sm:max-w-[90%] md:max-w-[600px] mx-auto"
       >
         {description}
       </Text>

@@ -96,7 +96,7 @@ export default function HeaderComponent() {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="absolute left-0 z-50 w-full p-6 mt-4 bg-white shadow-2xl top-full rounded-2xl lg:hidden">
+        <div className="absolute left-0 z-10 w-full p-6 mt-4 bg-white shadow-2xl top-full rounded-2xl lg:hidden">
           {/* Mobile Links */}
           <div className="flex flex-col gap-3">
             {HEADERLINKS.map((items, index) => (
@@ -105,9 +105,9 @@ export default function HeaderComponent() {
                 key={index}
                 className="
                   rounded-2xl px-4 py-4 text-base
-                  font-semibold text-[#00452E]
+                  font-semibold text-[#111111]
                   transition-all duration-300
-                  hover:bg-[#00452E]
+                  hover:bg-[#FF771F]
                   hover:text-white
                 "
                 _hover={{
