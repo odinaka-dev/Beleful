@@ -1,12 +1,44 @@
 "use client";
 
 import Heading from "@/components/ui/Heading";
-import FrequentlyComponent from "@/components/layout/frequently-asked-questions";
-import { BENEFITS, STEPS } from "@/helpers/agent.helpers";
+import { BelefulImages } from "@/constant/image";
+import Image from "next/image";
+import Marquee from "react-fast-marquee";
+
+const WHY_DELIVER_CARDS = [
+  {
+    image: BelefulImages.earnDrop,
+    color: "#93BFF0",
+    title: "Earn on every drop",
+    description:
+      "Get paid for each delivery you complete, with transparent payouts straight to your wallet.",
+  },
+  {
+    image: BelefulImages.stayCampus,
+    color: "#8BDF86",
+    title: "Stay close to campus",
+    description:
+      "Only get matched with nearby orders, so you never travel far from where you already are.",
+  },
+  {
+    image: BelefulImages.buildReputation,
+    color: "#EFBE82",
+    title: "Build your reputation",
+    description:
+      "Great ratings unlock priority orders and help you earn more as a trusted agent.",
+  },
+  {
+    image: BelefulImages.flexibleHours,
+    color: "#E693E0",
+    title: "Fully flexible hours",
+    description:
+      "Go online between lectures, in the evening, or on weekends. You decide when you work.",
+  },
+];
 
 export default function DeliveryAgentSubComponent() {
   return (
-    <div className="mx-auto my-24 max-w-[90%] lg:my-32 xl:max-w-[1200px]">
+    <div className="mx-auto my-24 max-w-[90%] lg:my-32 xl:max-w-[1400px]">
       {/* Intro */}
       <Heading
         className="hidden mx-auto max-w-[90%] lg:max-w-[760px]"
@@ -18,60 +50,42 @@ export default function DeliveryAgentSubComponent() {
       <div className="mt-24 lg:mt-32">
         <Heading
           className="mx-auto max-w-[90%] lg:max-w-[760px]"
-          title="Why deliver with Beleful"
-          description="A side hustle that actually fits around student life."
+          title="Why deliver with Grid Eats"
+          description="Grid Eats offers a variety of features that supports food business growth on campus, features like"
         />
 
-        <div className="grid grid-cols-1 gap-6 mt-12 sm:grid-cols-2 lg:grid-cols-4">
-          {BENEFITS.map((benefit, index) => {
-            const Icon = benefit.icon;
-            return (
+        <div className="mt-12">
+          <Marquee speed={30} gradient={false} pauseOnHover>
+            {WHY_DELIVER_CARDS.map((card, index) => (
               <div
                 key={index}
-                className="flex flex-col gap-4 rounded-3xl border border-[#00452E]/10 bg-white p-6 transition-shadow duration-300 hover:shadow-lg"
+                className="mx-3 w-[300px] shrink-0 overflow-hidden rounded-[28px] p-1.5 sm:w-[340px]"
+                style={{ backgroundColor: card.color }}
               >
-                <span className="flex size-14 items-center justify-center rounded-2xl bg-[#016644]/10">
-                  <Icon size={28} variant="Bold" color="#016644" />
-                </span>
-                <h3 className="text-xl font-bold text-[#111111]">
-                  {benefit.title}
-                </h3>
-                <p className="text-[15px] leading-relaxed text-sub-text-color">
-                  {benefit.description}
-                </p>
+                {/* Phone mockup on colored surface */}
+                <div className="flex justify-center px-4 pt-6">
+                  <Image
+                    src={card.image}
+                    alt={card.title}
+                    loading="eager"
+                    className="h-auto w-[85%]"
+                  />
+                </div>
+
+                {/* Copy */}
+                <div className="rounded-[22px] bg-white p-6">
+                  <h3 className="text-xl font-bold text-[#111111]">
+                    {card.title}
+                  </h3>
+                  <p className="mt-2 text-[15px] leading-relaxed text-sub-text-color">
+                    {card.description}
+                  </p>
+                </div>
               </div>
-            );
-          })}
+            ))}
+          </Marquee>
         </div>
       </div>
-
-      {/* How it works */}
-      <div className="mt-24 lg:mt-32">
-        <Heading
-          className="mx-auto max-w-[90%] lg:max-w-[760px]"
-          title="How it works"
-          description="From sign up to your first payout in four simple steps."
-        />
-
-        <div className="grid grid-cols-1 gap-6 mt-12 sm:grid-cols-2 lg:grid-cols-4">
-          {STEPS.map((step, index) => (
-            <div key={index} className="relative rounded-3xl bg-banner-bg p-7">
-              <span className="flex size-12 items-center justify-center rounded-full bg-[#016644] text-lg font-bold text-white">
-                {index + 1}
-              </span>
-              <h3 className="mt-5 text-lg font-bold text-[#111111]">
-                {step.title}
-              </h3>
-              <p className="mt-2 text-[15px] leading-relaxed text-sub-text-color">
-                {step.description}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* CTA */}
-      <FrequentlyComponent />
     </div>
   );
 }

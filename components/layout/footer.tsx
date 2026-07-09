@@ -154,7 +154,7 @@ export default function FooterComponent() {
           {/* Oversized brand watermark */}
           <span
             aria-hidden="true"
-            className="pointer-events-none select-none absolute -bottom-[0.18em] left-1/2 -translate-x-1/2 w-full text-center font-heading font-extrabold leading-none text-transparent bg-gradient-to-b from-red-variant to-red-variant/10 bg-clip-text text-[22vw] lg:text-[18vw]"
+            className="pointer-events-none select-none absolute -bottom-[0.40em] left-1/2 -translate-x-1/2 w-full text-center font-heading font-extrabold leading-none text-transparent bg-gradient-to-b from-red-variant to-red-variant/10 bg-clip-text text-[22vw] lg:text-[18vw]"
           >
             GridEats
           </span>
