@@ -15,7 +15,7 @@ export default function FoodVendorPage() {
       <main
         className="relative flex flex-col items-center justify-between h-screen bg-center bg-no-repeat bg-cover overflow-clip"
         style={{
-          backgroundImage: `url(${BelefulImages.bannerBackground.src})`,
+          backgroundImage: `url(${BelefulImages.deliveryBackground.src})`,
         }}
       >
         <div className="w-full max-w-[96%] xl:max-w-[1200px] mx-auto">
