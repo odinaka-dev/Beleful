@@ -19,11 +19,11 @@ export default function Homepage() {
       <main
         className="relative flex flex-col items-center justify-between h-screen bg-center bg-no-repeat bg-cover overflow-clip"
         style={{
-          backgroundImage: `url(${BelefulImages.bannerBackground.src})`,
+          backgroundImage: `url(${BelefulImages.deliveryBackground.src})`,
         }}
       >
         {/* <div className="absolute inset-0 bg-black/40" aria-hidden="true" /> */}
-        <div className="relative z-100 w-full max-w-[96%] xl:max-w-[1200px] mx-auto">
+        <div className="w-full max-w-[96%] xl:max-w-[1200px] mx-auto">
           <HeaderComponent />
         </div>
         <div className="relative w-full max-w-[96%] xl:max-w-[1200px] mx-auto h-screen flex items-center flex-col gap-12">
