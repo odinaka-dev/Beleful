@@ -13,7 +13,7 @@ import TestimonialImage from "@/public/asset/images/testimonial-image.png";
 import MapImage from "@/public/asset/images/map.svg";
 import FoodBottle from "@/public/asset/images/food-bottle.png";
 import HomeBanner from "@/public/asset/images/home-banner.png";
-import schoolImage from "@/public/asset/images/homepage-banner-image.png";
+import schoolImage from "@/public/asset/images/school-banner.svg";
 import OrderingImage from "@/public/asset/images/ordering.png";
 import StartDelivering from "@/public/asset/images/start-delivering.png";
 import StartSelling from "@/public/asset/images/start-selling.png";
@@ -28,6 +28,7 @@ import lasustech from "@/public/asset/images/lasustech.svg";
 import yabatech from "@/public/asset/images/yabatech.svg";
 import caleb from "@/public/asset/images/caleb.svg";
 import bannerBackground from "@/public/asset/images/banner-background.svg";
+import contactBackground from "@/public/asset/images/contact-background.svg";
 
 // IMPORTS FOR FOOD VENDORS PAGE
 import FoodVendor from "@/public/asset/images/food-vendor.svg";
@@ -68,6 +69,7 @@ interface Image {
   caleb: StaticImageData;
   bannerBackground: StaticImageData;
   schoolImage: StaticImageData;
+  contactBackground: StaticImageData;
 
   // FOOD VENDORS STATIC IMAGE IMPORTS
   FoodVendor: StaticImageData;
@@ -109,6 +111,7 @@ export const BelefulImages: Image = {
   caleb,
   bannerBackground,
   schoolImage,
+  contactBackground,
 
   // FOOD VENDORS IMAGES
   FoodVendor,
