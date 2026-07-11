@@ -86,10 +86,10 @@ export default function StudentLoginPage() {
       subtitle="Log in to keep the campus cravings coming."
       footer={
         <>
-          New to BELEFUL?{" "}
+          New to GRIDEATS?{" "}
           <Link
             href="/register"
-            className="font-semibold text-[#00452E] hover:underline"
+            className="font-semibold text-[#FF771F] hover:underline"
           >
             Create an account
           </Link>
@@ -125,7 +125,7 @@ export default function StudentLoginPage() {
           <div className="mt-2 text-right">
             <Link
               href="/forgot-password"
-              className="text-sm font-semibold text-[#00452E] hover:underline"
+              className="text-sm font-semibold text-[#FF771F] hover:underline"
             >
               Forgot password?
             </Link>

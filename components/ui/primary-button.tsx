@@ -31,7 +31,7 @@ export function PrimaryButton({
         "active:scale-[0.98]",
         fullWidth && "w-full",
         variant === "solid" &&
-          "bg-[#00452E] text-white shadow-sm hover:-translate-y-0.5 hover:bg-[#016644] hover:shadow-lg",
+          "bg-[#FF771F] text-white shadow-sm hover:-translate-y-0.5 hover:bg-[#FF771F]/90 hover:shadow-lg",
         variant === "outline" &&
           "border-2 border-[#00452E] bg-transparent text-[#00452E] hover:bg-[#00452E] hover:text-white",
         variant === "ghost" &&
