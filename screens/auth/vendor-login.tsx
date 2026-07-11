@@ -65,7 +65,7 @@ export default function VendorLoginPage() {
           Don&apos;t have a vendor account?{" "}
           <Link
             href="/vendor/register"
-            className="font-semibold text-[#00452E] hover:underline"
+            className="font-semibold text-[#FF771F] hover:underline"
           >
             Register your business
           </Link>
