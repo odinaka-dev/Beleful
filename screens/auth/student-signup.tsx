@@ -36,7 +36,11 @@ const EMPTY: StudentForm = {
 
 /** Student signup. */
 export default function StudentSignupPage() {
-  const { schools, loading: schoolsLoading, error: schoolsError } = useSchools();
+  const {
+    schools,
+    loading: schoolsLoading,
+    error: schoolsError,
+  } = useSchools();
   const [form, setForm] = useState<StudentForm>(EMPTY);
   const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -96,13 +100,13 @@ export default function StudentSignupPage() {
     <AuthShell
       role="student"
       title="Create your account"
-      subtitle="Join BELEFUL and get food delivered across campus."
+      subtitle="Join GRIDEATS and get food delivered across campus."
       footer={
         <>
           Already have an account?{" "}
           <Link
             href="/login"
-            className="font-semibold text-[#00452E] hover:underline"
+            className="font-semibold text-[#FF771F] hover:underline"
           >
             Log in
           </Link>
@@ -112,101 +116,107 @@ export default function StudentSignupPage() {
       {submitted ? (
         <CheckEmailNotice email={form.email} />
       ) : (
-      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-        {error && (
-          <p className="rounded-xl bg-[#FEE2E2] px-4 py-3 text-sm font-medium text-[#DC2626]">
-            {error}
-          </p>
-        )}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          {error && (
+            <p className="rounded-xl bg-[#FEE2E2] px-4 py-3 text-sm font-medium text-[#DC2626]">
+              {error}
+            </p>
+          )}
 
-        <FormField
-          label="Full name"
-          placeholder="Ada Okeke"
-          autoComplete="name"
-          required
-          value={form.fullName}
-          onChange={set("fullName")}
-          leftElement={<User size={18} variant="TwoTone" color="#666666" />}
-        />
-
-        <FormField
-          label="Email"
-          type="email"
-          placeholder="you@student.edu"
-          autoComplete="email"
-          required
-          value={form.email}
-          onChange={set("email")}
-          leftElement={<Sms size={18} variant="TwoTone" color="#666666" />}
-        />
-
-        <FormField
-          label="Phone number"
-          type="tel"
-          placeholder="080 1234 5678"
-          autoComplete="tel"
-          required
-          value={form.phone}
-          onChange={set("phone")}
-          leftElement={<Call size={18} variant="TwoTone" color="#666666" />}
-        />
-
-        <div className="grid gap-5 sm:grid-cols-2">
-          <SelectField
-            label="School"
-            options={schools}
-            placeholder="Select your school"
-            required
-            disabled={schoolsLoading}
-            value={form.schoolId}
-            onChange={set("schoolId")}
-            error={schoolsError ?? undefined}
-          />
           <FormField
-            label="Hostel / Residence"
-            placeholder="e.g. Moremi Hall or an off-campus lodge"
+            label="Full name"
+            placeholder="Ada Okeke"
+            autoComplete="name"
             required
-            value={form.hostel}
-            onChange={set("hostel")}
-            maxLength={160}
+            value={form.fullName}
+            onChange={set("fullName")}
+            leftElement={<User size={18} variant="TwoTone" color="#666666" />}
           />
-        </div>
 
-        <PasswordField
-          showStrength
-          placeholder="Create a password"
-          autoComplete="new-password"
-          required
-          value={form.password}
-          onChange={set("password")}
-        />
+          <FormField
+            label="Email"
+            type="email"
+            placeholder="you@student.edu"
+            autoComplete="email"
+            required
+            value={form.email}
+            onChange={set("email")}
+            leftElement={<Sms size={18} variant="TwoTone" color="#666666" />}
+          />
 
-        <PasswordField
-          label="Confirm password"
-          placeholder="Re-enter your password"
-          autoComplete="new-password"
-          required
-          value={form.confirmPassword}
-          onChange={set("confirmPassword")}
-          error={mismatch ? "Passwords do not match" : undefined}
-        />
+          <FormField
+            label="Phone number"
+            type="tel"
+            placeholder="080 1234 5678"
+            autoComplete="tel"
+            required
+            value={form.phone}
+            onChange={set("phone")}
+            leftElement={<Call size={18} variant="TwoTone" color="#666666" />}
+          />
 
-        <CheckboxField checked={agreed} onChange={setAgreed}>
-          I agree to BELEFUL&apos;s{" "}
-          <Link href="/terms" className="font-semibold text-[#00452E] hover:underline">
-            Terms of Service
-          </Link>{" "}
-          and{" "}
-          <Link href="/privacy" className="font-semibold text-[#00452E] hover:underline">
-            Privacy Policy
-          </Link>
-          .
-        </CheckboxField>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <SelectField
+              label="School"
+              options={schools}
+              placeholder="Select your school"
+              required
+              disabled={schoolsLoading}
+              value={form.schoolId}
+              onChange={set("schoolId")}
+              error={schoolsError ?? undefined}
+            />
+            <FormField
+              label="Hostel / Residence"
+              placeholder="e.g. Moremi Hall or an off-campus lodge"
+              required
+              value={form.hostel}
+              onChange={set("hostel")}
+              maxLength={160}
+            />
+          </div>
 
-        <PrimaryButton type="submit" loading={loading} disabled={!agreed}>
-          Continue
-        </PrimaryButton>
-      </form>
+          <PasswordField
+            showStrength
+            placeholder="Create a password"
+            autoComplete="new-password"
+            required
+            value={form.password}
+            onChange={set("password")}
+          />
+
+          <PasswordField
+            label="Confirm password"
+            placeholder="Re-enter your password"
+            autoComplete="new-password"
+            required
+            value={form.confirmPassword}
+            onChange={set("confirmPassword")}
+            error={mismatch ? "Passwords do not match" : undefined}
+          />
+
+          <CheckboxField checked={agreed} onChange={setAgreed}>
+            I agree to GRIDEATS&apos;s{" "}
+            <Link
+              href="/terms"
+              className="font-semibold text-[#FF771F] hover:underline"
+            >
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link
+              href="/privacy"
+              className="font-semibold text-[#FF771F] hover:underline"
+            >
+              Privacy Policy
+            </Link>
+            .
+          </CheckboxField>
+
+          <PrimaryButton type="submit" loading={loading} disabled={!agreed}>
+            Continue
+          </PrimaryButton>
+        </form>
       )}
     </AuthShell>
   );
