@@ -38,7 +38,11 @@ const EMPTY: VendorForm = {
 
 /** Vendor registration. */
 export default function VendorRegisterPage() {
-  const { schools, loading: schoolsLoading, error: schoolsError } = useSchools();
+  const {
+    schools,
+    loading: schoolsLoading,
+    error: schoolsError,
+  } = useSchools();
   const [form, setForm] = useState<VendorForm>(EMPTY);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -101,7 +105,7 @@ export default function VendorRegisterPage() {
           Already a vendor?{" "}
           <Link
             href="/vendor/login"
-            className="font-semibold text-[#00452E] hover:underline"
+            className="font-semibold text-[#FF771F] hover:underline"
           >
             Sign in
           </Link>
@@ -111,106 +115,104 @@ export default function VendorRegisterPage() {
       {submitted ? (
         <CheckEmailNotice email={form.email} />
       ) : (
-      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-        {error && (
-          <p className="rounded-xl bg-[#FEE2E2] px-4 py-3 text-sm font-medium text-[#DC2626]">
-            {error}
-          </p>
-        )}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          {error && (
+            <p className="rounded-xl bg-[#FEE2E2] px-4 py-3 text-sm font-medium text-[#DC2626]">
+              {error}
+            </p>
+          )}
 
-        <FormField
-          label="Business name"
-          placeholder="Mama's Kitchen"
-          required
-          value={form.businessName}
-          onChange={set("businessName")}
-          leftElement={<Shop size={18} variant="TwoTone" color="#666666" />}
-        />
-
-        <FormField
-          label="Vendor name"
-          placeholder="Owner / contact name"
-          required
-          value={form.vendorName}
-          onChange={set("vendorName")}
-          leftElement={<User size={18} variant="TwoTone" color="#666666" />}
-        />
-
-        <div className="grid gap-5 sm:grid-cols-2">
           <FormField
-            label="Phone number"
-            type="tel"
-            placeholder="080 1234 5678"
+            label="Business name"
+            placeholder="Mama's Kitchen"
             required
-            value={form.phone}
-            onChange={set("phone")}
-            leftElement={<Call size={18} variant="TwoTone" color="#666666" />}
+            value={form.businessName}
+            onChange={set("businessName")}
+            leftElement={<Shop size={18} variant="TwoTone" color="#666666" />}
           />
+
           <FormField
-            label="Email"
-            type="email"
-            placeholder="store@business.com"
+            label="Vendor name"
+            placeholder="Owner / contact name"
             required
-            value={form.email}
-            onChange={set("email")}
-            leftElement={<Sms size={18} variant="TwoTone" color="#666666" />}
+            value={form.vendorName}
+            onChange={set("vendorName")}
+            leftElement={<User size={18} variant="TwoTone" color="#666666" />}
           />
-        </div>
 
-        <SelectField
-          label="School / Campus"
-          options={schools}
-          placeholder="Select campus"
-          required
-          disabled={schoolsLoading}
-          value={form.schoolId}
-          onChange={set("schoolId")}
-          error={schoolsError ?? undefined}
-        />
+          <div className="grid gap-5 sm:grid-cols-2">
+            <FormField
+              label="Phone number"
+              type="tel"
+              placeholder="080 1234 5678"
+              required
+              value={form.phone}
+              onChange={set("phone")}
+              leftElement={<Call size={18} variant="TwoTone" color="#666666" />}
+            />
+            <FormField
+              label="Email"
+              type="email"
+              placeholder="store@business.com"
+              required
+              value={form.email}
+              onChange={set("email")}
+              leftElement={<Sms size={18} variant="TwoTone" color="#666666" />}
+            />
+          </div>
 
-        <FormField
-          label="Business address"
-          placeholder="Shop 12, Student Union Building"
-          required
-          value={form.address}
-          onChange={set("address")}
-          leftElement={<Location size={18} variant="TwoTone" color="#666666" />}
-        />
-
-        <FormField
-          label="CAC number"
-          optional
-          placeholder="RC 1234567"
-          value={form.cac}
-          onChange={set("cac")}
-        />
-
-        <PasswordField
-          showStrength
-          placeholder="Create a password"
-          autoComplete="new-password"
-          required
-          value={form.password}
-          onChange={set("password")}
-        />
-
-        <div className="grid gap-5 sm:grid-cols-[auto_1fr] sm:items-start">
-          <FileUpload
-            label="Logo"
-            variant="avatar"
-            hint="Square, PNG/JPG"
+          <SelectField
+            label="School / Campus"
+            options={schools}
+            placeholder="Select campus"
+            required
+            disabled={schoolsLoading}
+            value={form.schoolId}
+            onChange={set("schoolId")}
+            error={schoolsError ?? undefined}
           />
-          <FileUpload
-            label="Banner image"
-            variant="banner"
-            hint="Shown at the top of your store"
-          />
-        </div>
 
-        <PrimaryButton type="submit" loading={loading}>
-          Create vendor account
-        </PrimaryButton>
-      </form>
+          <FormField
+            label="Business address"
+            placeholder="Shop 12, Student Union Building"
+            required
+            value={form.address}
+            onChange={set("address")}
+            leftElement={
+              <Location size={18} variant="TwoTone" color="#666666" />
+            }
+          />
+
+          <FormField
+            label="CAC number"
+            optional
+            placeholder="RC 1234567"
+            value={form.cac}
+            onChange={set("cac")}
+          />
+
+          <PasswordField
+            showStrength
+            placeholder="Create a password"
+            autoComplete="new-password"
+            required
+            value={form.password}
+            onChange={set("password")}
+          />
+
+          <div className="grid gap-5 sm:grid-cols-[auto_1fr] sm:items-start">
+            <FileUpload label="Logo" variant="avatar" hint="Square, PNG/JPG" />
+            <FileUpload
+              label="Banner image"
+              variant="banner"
+              hint="Shown at the top of your store"
+            />
+          </div>
+
+          <PrimaryButton type="submit" loading={loading}>
+            Create vendor account
+          </PrimaryButton>
+        </form>
       )}
     </AuthShell>
   );

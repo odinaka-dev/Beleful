@@ -36,7 +36,11 @@ const EMPTY: AgentForm = {
 
 /** Delivery agent registration. */
 export default function AgentRegisterPage() {
-  const { schools, loading: schoolsLoading, error: schoolsError } = useSchools();
+  const {
+    schools,
+    loading: schoolsLoading,
+    error: schoolsError,
+  } = useSchools();
   const [form, setForm] = useState<AgentForm>(EMPTY);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -98,7 +102,7 @@ export default function AgentRegisterPage() {
           Already an agent?{" "}
           <Link
             href="/agent/login"
-            className="font-semibold text-[#00452E] hover:underline"
+            className="font-semibold text-[#FF771F] hover:underline"
           >
             Sign in
           </Link>
@@ -117,7 +121,7 @@ export default function AgentRegisterPage() {
 
           {/* Verification notice */}
           <div className="flex items-start gap-3 rounded-2xl border border-[#FCD882]/60 bg-[#FFFFDE] p-4">
-            <span className="mt-0.5 text-[#00452E]">
+            <span className="mt-0.5 text-[#FF771F]">
               <ShieldTick size={22} variant="Bold" />
             </span>
             <div>
@@ -130,9 +134,9 @@ export default function AgentRegisterPage() {
                 </StatusBadge>
               </div>
               <p className="text-xs leading-relaxed text-[#666666]">
-                After you confirm your email and sign in, upload a valid
-                Student ID from your dashboard. Our team reviews new agents
-                within 24 hours before you can accept deliveries.
+                After you confirm your email and sign in, upload a valid Student
+                ID from your dashboard. Our team reviews new agents within 24
+                hours before you can accept deliveries.
               </p>
             </div>
           </div>

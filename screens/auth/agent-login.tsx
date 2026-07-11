@@ -62,10 +62,10 @@ export default function AgentLoginPage() {
       subtitle="Pick up deliveries and track your earnings."
       footer={
         <>
-          Want to deliver with BELEFUL?{" "}
+          Want to deliver with GRIDEATS?{" "}
           <Link
             href="/agent/register"
-            className="font-semibold text-[#00452E] hover:underline"
+            className="font-semibold text-[#FF771F] hover:underline"
           >
             Become an agent
           </Link>

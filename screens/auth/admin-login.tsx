@@ -12,10 +12,6 @@ import { signInWithRole } from "@/lib/auth/sign-in";
 import { ROLE_DASHBOARD_PATH } from "@/lib/auth/roles";
 import { toaster } from "@/components/ui/toaster";
 
-/**
- * Admin sign in. No registration flow exists for this role on purpose —
- * admin accounts are provisioned directly in Supabase, never self-service.
- */
 export default function AdminLoginPage() {
   const router = useRouter();
   const [form, setForm] = useState({ email: "", password: "" });
@@ -64,14 +60,14 @@ export default function AdminLoginPage() {
         <div className="flex flex-col items-center text-center mb-7">
           <Image
             src={BelefulImages.logoImage}
-            alt="BELEFUL"
+            alt="admin_grideats_logo"
             className="mb-4 w-28"
           />
           <h1 className="font-heading text-xl font-bold text-[#111111]">
             Admin access
           </h1>
           <p className="mt-1.5 text-sm text-[#666666]">
-            Restricted to BELEFUL team accounts.
+            Restricted to GRIDEATS team accounts.
           </p>
         </div>
 
