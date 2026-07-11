@@ -41,6 +41,12 @@ import stayCampus from "@/public/asset/images/agent-2.svg";
 import buildReputation from "@/public/asset/images/agent-3.svg";
 import flexibleHours from "@/public/asset/images/agent-4.png";
 
+// AUTH IMAGES IMPORTS
+import studentAuthImage from "@/public/asset/images/student-auth-image.png";
+import authBackground from "@/public/asset/images/auth-background.svg";
+import vendorBackground from "@/public/asset/images/vendorBackground.svg";
+import vendorAuthImage from "@/public/asset/images/vendor-auth-image.png";
+
 interface Image {
   Burger: StaticImageData;
   CardImageone: StaticImageData;
@@ -81,6 +87,12 @@ interface Image {
   stayCampus: StaticImageData;
   buildReputation: StaticImageData;
   flexibleHours: StaticImageData;
+
+  // AUTH STATIC IMAGES IMPORTS
+  studentAuthImage: StaticImageData;
+  authBackground: StaticImageData;
+  vendorBackground: StaticImageData;
+  vendorAuthImage: StaticImageData;
 }
 
 export const BelefulImages: Image = {
@@ -123,4 +135,10 @@ export const BelefulImages: Image = {
   stayCampus,
   buildReputation,
   flexibleHours,
+
+  // AUTH IMAGES
+  studentAuthImage,
+  authBackground,
+  vendorBackground,
+  vendorAuthImage,
 };

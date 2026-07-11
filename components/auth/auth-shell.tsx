@@ -1,14 +1,14 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 import { BelefulImages } from "@/constant/image";
 import { cn } from "@/lib/utils";
-import UserLottieFile from "@/public/lottie/food.json";
+// import UserLottieFile from "@/public/lottie/food.json";
 import ShopLottieFile from "@/public/lottie/Food_Beverage.json";
 import DeliveryLottieFile from "@/public/lottie/fooddeliveryboy.json";
-import Lottie from "lottie-react";
+// import Lottie from "lottie-react";
 
 export type AuthRole = "student" | "vendor" | "agent";
 
@@ -29,7 +29,8 @@ interface AuthHighlight {
   heading: string;
   sub: string;
   bullets: string[];
-  image: object; // or Record<string, unknown>
+  image: StaticImageData;
+  backgroundImage: StaticImageData;
   accent: string;
 }
 
@@ -44,8 +45,9 @@ const ROLE_HIGHLIGHT: Record<AuthRole, AuthHighlight> = {
       "Live delivery tracking & PIN handoff",
       "Student-friendly delivery fees",
     ],
-    image: UserLottieFile,
-    accent: "#00452E",
+    image: BelefulImages.studentAuthImage,
+    backgroundImage: BelefulImages.authBackground,
+    accent: "#FF771F",
   },
   vendor: {
     eyebrow: "For vendors",
@@ -56,8 +58,9 @@ const ROLE_HIGHLIGHT: Record<AuthRole, AuthHighlight> = {
       "Manage menu & orders in one place",
       "Fast, reliable payouts",
     ],
-    image: ShopLottieFile,
-    accent: "#00452E",
+    image: BelefulImages.vendorAuthImage,
+    backgroundImage: BelefulImages.vendorBackground,
+    accent: "#FF771F",
   },
   agent: {
     eyebrow: "For Delivery Agents",
@@ -68,27 +71,22 @@ const ROLE_HIGHLIGHT: Record<AuthRole, AuthHighlight> = {
       "Transparent earnings per trip",
       "Withdraw your balance anytime",
     ],
-    image: DeliveryLottieFile,
-    accent: "#00452E",
+    image: BelefulImages.deliveryAgent,
+    backgroundImage: BelefulImages.authBackground,
+
+    accent: "#FF771F",
   },
 };
 
 interface AuthShellProps {
   role: AuthRole;
-  /** Form heading, e.g. "Welcome back". */
   title: string;
   subtitle: string;
   children: React.ReactNode;
-  /** CTA shown under the form, e.g. switch between login/signup. */
   footer?: React.ReactNode;
-  /** Hide the role switcher (used on registration sub-flows if desired). */
   hideRoleTabs?: boolean;
 }
 
-/**
- * Two-column auth scaffold: brand illustration panel (desktop) + form panel.
- * Mobile shows a compact branded header above the form.
- */
 export function AuthShell({
   role,
   title,
@@ -102,10 +100,10 @@ export function AuthShell({
   return (
     <div className="flex w-full h-screen overflow-hidden bg-white">
       {/* Illustration panel — desktop only */}
-      <aside className="relative hidden w-[44%] flex-col justify-between overflow-hidden bg-[#00452E] p-10 lg:flex xl:w-[48%] xl:p-14">
-        <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-[#016644]/40 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-24 -left-10 h-72 w-72 rounded-full bg-[#FCD882]/20 blur-3xl" />
-
+      <aside
+        className="relative hidden w-[44%] flex-col justify-between overflow-hidden bg-[#00452E] bg-cover bg-center p-10 lg:flex xl:w-[48%] xl:p-14"
+        style={{ backgroundImage: `url(${highlight.backgroundImage.src})` }}
+      >
         <Link href="/" className="relative z-10 w-fit">
           <Image
             src={BelefulImages.logoImage}
@@ -115,27 +113,22 @@ export function AuthShell({
         </Link>
 
         <div className="relative z-10">
-          <span className="inline-flex rounded-full bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-[#FCD882]">
+          <span className="inline-flex rounded-full bg-[#FCD882]/40 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-[#111111]">
             {highlight.eyebrow}
           </span>
-          <h2 className="max-w-md mt-5 text-4xl font-bold leading-tight text-white font-heading">
+          <h2 className="max-w-md mt-5 text-4xl font-bold leading-tight text-[#111111] font-heading">
             {highlight.heading}
           </h2>
-          <p className="max-w-md mt-4 text-base leading-relaxed text-white/70">
+          <p className="max-w-md mt-4 text-base leading-relaxed text-[#111111]/70 font-medium">
             {highlight.sub}
           </p>
         </div>
 
         <div className="">
-          {/* <Image
-            src={BelefulImages.Burger}
-            alt=""
+          <Image
+            src={highlight.image}
+            alt="auth_images"
             className="object-contain w-full"
-          /> */}
-          <Lottie
-            animationData={highlight.image}
-            loop
-            className="w-full max-w-[300px] sm:max-w-[420px] lg:max-w-[720px]"
           />
         </div>
       </aside>
@@ -159,9 +152,9 @@ export function AuthShell({
                   key={tab.role}
                   href={tab.loginHref}
                   className={cn(
-                    "rounded-xl py-2.5 text-center text-sm font-semibold transition-all duration-200",
+                    "rounded-full py-2.5 text-center text-sm font-semibold transition-all duration-200",
                     tab.role === role
-                      ? "bg-[#00452E] text-white shadow-sm"
+                      ? "bg-[#FF771F] text-white shadow-sm"
                       : "text-[#666666] hover:text-[#00452E]",
                   )}
                 >
