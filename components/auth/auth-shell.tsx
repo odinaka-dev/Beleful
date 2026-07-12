@@ -100,7 +100,7 @@ export function AuthShell({
   return (
     <div className="flex w-full h-screen overflow-hidden bg-white">
       <aside
-        className="relative hidden w-[44%] flex-col justify-between overflow-hidden bg-[#00452E] bg-cover bg-center p-10 pb-0 lg:flex xl:w-[48%] xl:p-10 xl:pb-0"
+        className="relative hidden w-[44%] flex-col justify-between overflow-hidden bg-cover bg-center p-10 pb-0 lg:flex xl:w-[48%] xl:p-10 xl:pb-0 xl:pr-0"
         style={{ backgroundImage: `url(${highlight.backgroundImage.src})` }}
       >
         <Link href="/" className="relative z-10 w-fit">
